@@ -39,6 +39,16 @@ class UserProfile(models.Model):
         ('YYYY-MM-DD', 'YYYY-MM-DD'),
     ]
 
+    CURRENCY_CHOICES = [
+        ('USD', _('US Dollar ($)')),
+        ('INR', _('Indian Rupee (₹)')),
+        ('EUR', _('Euro (€)')),
+        ('GBP', _('British Pound (£)')),
+        ('JPY', _('Japanese Yen (¥)')),
+        ('CAD', _('Canadian Dollar (C$)')),
+        ('AUD', _('Australian Dollar (A$)')),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -46,6 +56,7 @@ class UserProfile(models.Model):
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='en')
     timezone = models.CharField(max_length=50, choices=TIMEZONE_CHOICES, default='UTC')
     date_format = models.CharField(max_length=20, choices=DATE_FORMAT_CHOICES, default='MM/DD/YYYY')
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='USD')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

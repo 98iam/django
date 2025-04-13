@@ -58,6 +58,12 @@ class GeminiService:
             # Get relevant inventory context based on the user's message
             try:
                 # Pass the user to filter products by this user's account
+                logger.info(f"User for context: {user.username if user else 'None'}")
+                if user and hasattr(user, 'profile'):
+                    logger.info(f"User currency preference: {user.profile.currency}")
+                else:
+                    logger.warning(f"User has no profile or currency preference")
+
                 inventory_context = InventoryContext.get_relevant_context(last_user_message, user=user)
                 logger.info(f"Retrieved inventory context: {len(inventory_context)} characters")
                 if inventory_context:
@@ -89,6 +95,9 @@ class GeminiService:
                 "- Category information and relationships\n"
                 "- Trends or patterns you notice in the data\n"
                 "- Comparisons between products or categories when relevant\n"
+                "\n"
+                "Note that all monetary values are displayed in the user's preferred currency.\n"
+                "The currency symbol shown in the data reflects the user's currency preference.\n"
                 "\n\n"
                 "Always show your calculations when computing values. For example, when calculating total value, "
                 "show the quantity × price formula and the result. "

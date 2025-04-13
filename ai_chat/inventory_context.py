@@ -6,6 +6,9 @@ import logging
 # Import mock data for fallback
 from .mock_data import get_mock_inventory_summary, get_mock_product_info, get_mock_sales_analytics
 
+# Import utility functions
+from .utils import format_currency, get_currency_symbol
+
 # Import models - with error handling for testing
 try:
     from products.models import Product, Category, Sale
@@ -36,7 +39,15 @@ class InventoryContext:
         """
         if not MODELS_AVAILABLE:
             logger.info("Using mock product data")
-            return get_mock_product_info()
+            # Get currency symbol if user has a preference
+            currency_symbol = '$'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_symbol = get_currency_symbol(user.profile.currency)
+                except Exception as e:
+                    logger.error(f"Error getting user currency symbol: {str(e)}")
+
+            return get_mock_product_info(currency_symbol)
 
         try:
             # Filter products by user if provided
@@ -73,6 +84,14 @@ class InventoryContext:
                 else:
                     return "No products found in the inventory."
 
+            # Get user's currency preference if available
+            currency_code = 'USD'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_code = user.profile.currency
+                except Exception as e:
+                    logger.error(f"Error getting user currency: {str(e)}")
+
             # Format product information with more details
             result = "Product Information:\n"
             for product in product_list:
@@ -84,12 +103,12 @@ class InventoryContext:
                 result += f"- {product.name} (SKU: {product.sku})\n"
                 result += f"  Description: {product.description or 'No description available'}\n"
                 result += f"  Category: {product.category.name if product.category else 'Uncategorized'}\n"
-                result += f"  Price: ${product.price}\n"
-                result += f"  Cost: ${product.cost}\n"
+                result += f"  Price: {format_currency(product.price, currency_code)}\n"
+                result += f"  Cost: {format_currency(product.cost, currency_code)}\n"
                 result += f"  Profit Margin: {product.profit_margin:.2f}%\n"
                 result += f"  In Stock: {product.quantity}\n"
-                result += f"  Total Value: ${product_value:.2f}\n"
-                result += f"  Potential Profit: ${total_profit_potential:.2f}\n"
+                result += f"  Total Value: {format_currency(product_value, currency_code)}\n"
+                result += f"  Potential Profit: {format_currency(total_profit_potential, currency_code)}\n"
                 result += f"  Minimum Stock: {product.minimum_stock}\n"
                 result += f"  Maximum Stock: {product.maximum_stock}\n"
                 result += f"  Stock Status: {product.stock_status}\n"
@@ -126,7 +145,15 @@ class InventoryContext:
         """
         if not MODELS_AVAILABLE:
             logger.info("Using mock inventory summary")
-            return get_mock_inventory_summary()
+            # Get currency symbol if user has a preference
+            currency_symbol = '$'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_symbol = get_currency_symbol(user.profile.currency)
+                except Exception as e:
+                    logger.error(f"Error getting user currency symbol: {str(e)}")
+
+            return get_mock_inventory_summary(currency_symbol)
 
         try:
             # Filter by user if provided
@@ -187,11 +214,19 @@ class InventoryContext:
             result += f"Out of Stock Items: {out_of_stock}\n"
             result += f"Overstocked Items: {overstocked}\n"
 
+            # Get user's currency preference if available
+            currency_code = 'USD'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_code = user.profile.currency
+                except Exception as e:
+                    logger.error(f"Error getting user currency: {str(e)}")
+
             # Financial metrics section
             result += "\nFinancial Metrics:\n"
-            result += f"Total Inventory Value: ${total_inventory_value:.2f}\n"
-            result += f"Total Inventory Cost: ${total_inventory_cost:.2f}\n"
-            result += f"Total Potential Profit: ${total_potential_profit:.2f}\n"
+            result += f"Total Inventory Value: {format_currency(total_inventory_value, currency_code)}\n"
+            result += f"Total Inventory Cost: {format_currency(total_inventory_cost, currency_code)}\n"
+            result += f"Total Potential Profit: {format_currency(total_potential_profit, currency_code)}\n"
             result += f"Average Profit Margin: {avg_profit_margin:.2f}%\n"
 
             # Time-based information
@@ -207,7 +242,7 @@ class InventoryContext:
                 result += "Sample Products:\n"
                 for product in sample_products:
                     product_value = product.price * product.quantity
-                    result += f"- {product.name}: {product.quantity} in stock, ${product.price} each, total value: ${product_value:.2f}\n"
+                    result += f"- {product.name}: {product.quantity} in stock, {format_currency(product.price, currency_code)} each, total value: {format_currency(product_value, currency_code)}\n"
                 result += "\n"
 
             # Get top categories by product count if any exist
@@ -235,7 +270,7 @@ class InventoryContext:
                             category_value = sum(p.price * p.quantity for p in category_products)
                             category_items = sum(p.quantity for p in category_products)
 
-                            result += f"- {category.name}: {category.product_count} products, {category_items} items, value: ${category_value:.2f}\n"
+                            result += f"- {category.name}: {category.product_count} products, {category_items} items, value: {format_currency(category_value, currency_code)}\n"
                 except Exception as category_error:
                     logger.error(f"Error getting categories: {str(category_error)}")
                     result += "\nNote: Unable to retrieve category information.\n"
@@ -257,7 +292,15 @@ class InventoryContext:
         """
         if not MODELS_AVAILABLE:
             logger.info("Using mock sales analytics")
-            return get_mock_sales_analytics()
+            # Get currency symbol if user has a preference
+            currency_symbol = '$'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_symbol = get_currency_symbol(user.profile.currency)
+                except Exception as e:
+                    logger.error(f"Error getting user currency symbol: {str(e)}")
+
+            return get_mock_sales_analytics(currency_symbol)
 
         try:
             # Filter sales by user if provided
@@ -314,17 +357,25 @@ class InventoryContext:
                 if count > 0:
                     payment_methods[method_name] = count
 
+            # Get user's currency preference if available
+            currency_code = 'USD'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_code = user.profile.currency
+                except Exception as e:
+                    logger.error(f"Error getting user currency: {str(e)}")
+
             # Build the result with comprehensive information
             result = "Sales Analytics:\n"
             result += f"Total Sales: {total_sales}\n"
-            result += f"Total Revenue: ${total_revenue:.2f}\n"
-            result += f"Average Sale Value: ${avg_sale_value:.2f}\n\n"
+            result += f"Total Revenue: {format_currency(total_revenue, currency_code)}\n"
+            result += f"Average Sale Value: {format_currency(avg_sale_value, currency_code)}\n\n"
 
             # Time-based analytics
             result += "Time-Based Analytics:\n"
-            result += f"Today: {today_count} sales, ${today_revenue:.2f} revenue\n"
-            result += f"Last 7 Days: {weekly_count} sales, ${weekly_revenue:.2f} revenue\n"
-            result += f"Last 30 Days: {recent_count} sales, ${recent_revenue:.2f} revenue\n"
+            result += f"Today: {today_count} sales, {format_currency(today_revenue, currency_code)} revenue\n"
+            result += f"Last 7 Days: {weekly_count} sales, {format_currency(weekly_revenue, currency_code)} revenue\n"
+            result += f"Last 30 Days: {recent_count} sales, {format_currency(recent_revenue, currency_code)} revenue\n"
 
             if oldest_sale:
                 result += f"First Sale: {oldest_sale.sale_date.strftime('%Y-%m-%d')}\n"
@@ -361,13 +412,13 @@ class InventoryContext:
                     result += "Top Selling Products:\n"
                     for product in product_list:
                         revenue = product.revenue or 0
-                        result += f"- {product.name}: {product.sale_count} sales, ${revenue:.2f} revenue\n"
+                        result += f"- {product.name}: {product.sale_count} sales, {format_currency(revenue, currency_code)} revenue\n"
 
                     # Also show products by revenue
                     result += "\nTop Products by Revenue:\n"
                     for product in sorted(product_list, key=lambda p: p.revenue or 0, reverse=True)[:5]:
                         revenue = product.revenue or 0
-                        result += f"- {product.name}: ${revenue:.2f} revenue, {product.sale_count} sales\n"
+                        result += f"- {product.name}: {format_currency(revenue, currency_code)} revenue, {product.sale_count} sales\n"
             except Exception as product_error:
                 logger.error(f"Error getting top products: {str(product_error)}")
                 result += "\nNote: Unable to retrieve top selling products.\n"
@@ -394,7 +445,7 @@ class InventoryContext:
                     for category in category_list:
                         revenue = category.revenue or 0
                         if revenue > 0:  # Only show categories with sales
-                            result += f"- {category.name}: ${revenue:.2f} revenue, {category.sale_count} sales\n"
+                            result += f"- {category.name}: {format_currency(revenue, currency_code)} revenue, {category.sale_count} sales\n"
             except Exception as category_error:
                 logger.error(f"Error getting category sales: {str(category_error)}")
                 # Don't add error message to result if this fails
@@ -420,10 +471,18 @@ class InventoryContext:
         """
         if not MODELS_AVAILABLE:
             logger.warning("Models not available when getting context, using mock data")
+            # Get currency symbol if user has a preference
+            currency_symbol = '$'  # Default
+            if user and hasattr(user, 'profile'):
+                try:
+                    currency_symbol = get_currency_symbol(user.profile.currency)
+                except Exception as e:
+                    logger.error(f"Error getting user currency symbol: {str(e)}")
+
             # Use mock data instead of returning an error
-            context = get_mock_inventory_summary()
-            context += "\n\n" + get_mock_product_info()
-            context += "\n\n" + get_mock_sales_analytics()
+            context = get_mock_inventory_summary(currency_symbol)
+            context += "\n\n" + get_mock_product_info(currency_symbol)
+            context += "\n\n" + get_mock_sales_analytics(currency_symbol)
             return context
 
         user_message = user_message.lower()
@@ -514,10 +573,18 @@ class InventoryContext:
                 total_cost = sum(p.cost * p.quantity for p in products)
                 total_profit = total_value - total_cost
 
+                # Get user's currency preference if available
+                currency_code = 'USD'  # Default
+                if user and hasattr(user, 'profile'):
+                    try:
+                        currency_code = user.profile.currency
+                    except Exception as e:
+                        logger.error(f"Error getting user currency: {str(e)}")
+
                 value_info = "\nInventory Value Information:\n"
-                value_info += f"Total Inventory Value: ${total_value:.2f}\n"
-                value_info += f"Total Inventory Cost: ${total_cost:.2f}\n"
-                value_info += f"Total Potential Profit: ${total_profit:.2f}\n"
+                value_info += f"Total Inventory Value: {format_currency(total_value, currency_code)}\n"
+                value_info += f"Total Inventory Cost: {format_currency(total_cost, currency_code)}\n"
+                value_info += f"Total Potential Profit: {format_currency(total_profit, currency_code)}\n"
 
                 # Get most valuable products
                 valuable_products = sorted(products, key=lambda p: p.price * p.quantity, reverse=True)[:5]
@@ -525,14 +592,14 @@ class InventoryContext:
                 value_info += "\nMost Valuable Products (by total value):\n"
                 for product in valuable_products:
                     product_value = product.price * product.quantity
-                    value_info += f"- {product.name}: ${product_value:.2f} (${product.price} × {product.quantity})\n"
+                    value_info += f"- {product.name}: {format_currency(product_value, currency_code)} ({format_currency(product.price, currency_code)} × {product.quantity})\n"
 
                 # Get highest margin products
                 margin_products = sorted(products, key=lambda p: p.profit_margin, reverse=True)[:5]
 
                 value_info += "\nHighest Margin Products:\n"
                 for product in margin_products:
-                    value_info += f"- {product.name}: {product.profit_margin:.2f}% margin (Cost: ${product.cost}, Price: ${product.price})\n"
+                    value_info += f"- {product.name}: {product.profit_margin:.2f}% margin (Cost: {format_currency(product.cost, currency_code)}, Price: {format_currency(product.price, currency_code)})\n"
 
                 context += "\n" + value_info
                 logger.info(f"Added value information: {len(value_info)} chars")
@@ -576,9 +643,17 @@ class InventoryContext:
                 if category:
                     category_products = Product.objects.filter(category=category)
 
+                    # Get user's currency preference if available
+                    currency_code = 'USD'  # Default
+                    if user and hasattr(user, 'profile'):
+                        try:
+                            currency_code = user.profile.currency
+                        except Exception as e:
+                            logger.error(f"Error getting user currency: {str(e)}")
+
                     category_info = f"\nProducts in Category '{category.name}':\n"
                     for product in category_products:
-                        category_info += f"- {product.name}: {product.quantity} in stock, ${product.price}\n"
+                        category_info += f"- {product.name}: {product.quantity} in stock, {format_currency(product.price, currency_code)}\n"
 
                     context += "\n" + category_info
                     logger.info(f"Added category products: {len(category_info)} chars")

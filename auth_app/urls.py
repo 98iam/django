@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import views_settings
+from . import views_debug
 
 urlpatterns = [
     # Authentication views
@@ -15,4 +16,7 @@ urlpatterns = [
     path('settings/security/', views_settings.settings_security, name='settings_security'),
     path('settings/save-appearance/', views_settings.save_appearance_settings, name='save_appearance_settings'),
     path('settings/send-test-email/', views_settings.send_test_email, name='send_test_email'),
+
+    # Debug views
+    path('debug/profile/', views_debug.debug_user_profile, name='debug_user_profile'),
 ]

@@ -185,5 +185,10 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'ai_chat.utils': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }

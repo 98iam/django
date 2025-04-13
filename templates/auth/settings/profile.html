@@ -8,7 +8,7 @@
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-            
+
             <div class="row mb-4">
                 <div class="col-md-3">
                     <div class="text-center mb-3">
@@ -30,10 +30,10 @@
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <div class="col-md-9">
                     <h6 class="mb-3">Personal Information</h6>
-                    
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
@@ -46,19 +46,19 @@
                             {{ form.last_name }}
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
                         {{ form.email.errors }}
                         {{ form.email }}
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
                         {{ form.phone.errors }}
                         {{ form.phone }}
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
                         {{ form.address.errors }}
@@ -66,27 +66,32 @@
                     </div>
                 </div>
             </div>
-            
+
             <h6 class="mb-3">Account Preferences</h6>
-            
+
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="{{ form.language.id_for_label }}" class="form-label">Language</label>
                     {{ form.language.errors }}
                     {{ form.language }}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="{{ form.timezone.id_for_label }}" class="form-label">Timezone</label>
                     {{ form.timezone.errors }}
                     {{ form.timezone }}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="{{ form.date_format.id_for_label }}" class="form-label">Date Format</label>
                     {{ form.date_format.errors }}
                     {{ form.date_format }}
                 </div>
+                <div class="col-md-3">
+                    <label for="{{ form.currency.id_for_label }}" class="form-label">Currency</label>
+                    {{ form.currency.errors }}
+                    {{ form.currency }}
+                </div>
             </div>
-            
+
             <div class="mt-4">
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
