@@ -1,0 +1,34 @@
+{% load static %}
+
+<div class="ai-chat-sidebar">
+    <div class="sidebar-header">
+        <h5><i class="fas fa-robot"></i> AI Assistant</h5>
+        <button id="newChatBtn" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> New Chat
+        </button>
+    </div>
+    
+    <div class="sidebar-sessions">
+        {% if sessions %}
+            {% for session in sessions %}
+                <div class="chat-session-item {% if session.id == current_session.id %}active{% endif %}" 
+                     data-session-id="{{ session.id }}">
+                    <a href="{% url 'chat_session_detail' session.id %}">
+                        <i class="fas fa-comment-dots"></i> {{ session.title }}
+                    </a>
+                    <form method="post" action="{% url 'delete_session' session.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-link text-danger delete-session">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-sessions">
+                <p>No chat sessions yet.</p>
+                <p>Start a new chat to get help from the AI assistant.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
