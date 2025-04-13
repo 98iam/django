@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-mpm@s0t(%ki&a)z7j#hihz6miyy%(wf#(p_l_-k4e06n9qs8el"
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-mpm@s0t(%ki&a)z7j#hihz6miyy%(wf#(p_l_-k4e06n9qs8el')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # When DEBUG is False, you MUST specify allowed hosts
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Add your domain names here
@@ -94,11 +94,11 @@ logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': ';~C#Y8SbfY},MruF',
-        'HOST': 'db.ljmzjgzbzvlhxeuwktpu.supabase.co',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'postgres'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
         },
@@ -154,7 +154,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Gemini AI API settings
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
-GEMINI_MODEL = os.environ.get('GEMINI_MODEL', '')
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-1.5-flash')  # Default to gemini-1.5-flash if not specified
 
 # Logging configuration
 LOGGING = {

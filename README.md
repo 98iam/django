@@ -172,6 +172,15 @@ The system includes an AI chat assistant powered by Google Gemini:
    - Create multiple chat sessions
    - View chat history
    - Rename and delete chat sessions
+   - Access user-specific inventory data (the AI only shows products belonging to the current user)
+   - Get detailed product information, inventory summaries, and sales analytics
+   - Chat directly in the sidebar or expand to a full-page view
+
+3. **How It Works**:
+   - The AI assistant has access to your inventory data in real-time
+   - It can answer questions about your products, stock levels, categories, and sales
+   - All data is filtered by user, so each user only sees their own inventory information
+   - The system uses mock data as a fallback if there are any issues accessing the database
 
 ## Troubleshooting
 
@@ -185,6 +194,9 @@ The system includes an AI chat assistant powered by Google Gemini:
 - If the AI chat is not working, check that your Gemini API key is valid and correctly set in the `.env` file
 - Make sure you have internet access as the AI chat requires API calls to Google's servers
 - If you get model-related errors, try specifying a different model by uncommenting and setting the `GEMINI_MODEL` variable in your `.env` file
+- If the AI doesn't show your products, make sure you're logged in and have added products to your account
+- The AI will use mock data as a fallback if there are database connection issues
+- If you get a "Failed to fetch" error, try refreshing the page or checking your internet connection
 
 ### Static Files Not Loading
 

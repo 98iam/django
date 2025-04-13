@@ -88,7 +88,8 @@ def send_message(request):
         # Get response from Gemini
         try:
             gemini_service = GeminiService()
-            ai_response = gemini_service.generate_response(message_list)
+            # Pass the user to filter products by this user's account
+            ai_response = gemini_service.generate_response(message_list, user=request.user)
 
             # Save the AI response
             assistant_message = ChatMessage.objects.create(
