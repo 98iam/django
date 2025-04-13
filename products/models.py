@@ -160,8 +160,11 @@ class UserPreference(models.Model):
         'total_categories': {'enabled': True, 'order': 2},
         'low_stock_products': {'enabled': True, 'order': 3},
         'total_value': {'enabled': True, 'order': 4},
-        'recent_products': {'enabled': True, 'order': 5},
-        'categories_with_counts': {'enabled': True, 'order': 6},
+        'sales_trends_chart': {'enabled': True, 'order': 5},
+        'inventory_value_chart': {'enabled': True, 'order': 6},
+        'product_performance_chart': {'enabled': True, 'order': 7},
+        'recent_products': {'enabled': True, 'order': 8},
+        'categories_with_counts': {'enabled': True, 'order': 9},
     }
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='preferences')

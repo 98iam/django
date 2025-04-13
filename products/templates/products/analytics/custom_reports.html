@@ -174,52 +174,52 @@
         const reportForm = document.getElementById('reportForm');
         const activeFilters = document.getElementById('activeFilters');
         const addFilterBtn = document.getElementById('addFilterBtn');
-        
+
         // Add filter
         addFilterBtn.addEventListener('click', function() {
             const field = document.getElementById('filterField').value;
             const operator = document.getElementById('filterOperator').value;
             const value = document.getElementById('filterValue').value;
-            
+
             if (!value) return;
-            
+
             const filterDiv = document.createElement('div');
             filterDiv.className = 'alert alert-secondary d-flex justify-content-between align-items-center py-1 px-2 mb-1';
             filterDiv.innerHTML = `
                 <span>${field} ${operator.replace('_', ' ')} ${value}</span>
                 <button type="button" class="btn-close btn-sm" aria-label="Close"></button>
             `;
-            
+
             // Add data attributes for saving
             filterDiv.dataset.field = field;
             filterDiv.dataset.operator = operator;
             filterDiv.dataset.value = value;
-            
+
             // Add remove button functionality
             filterDiv.querySelector('.btn-close').addEventListener('click', function() {
                 filterDiv.remove();
                 updatePreview();
             });
-            
+
             activeFilters.appendChild(filterDiv);
             document.getElementById('filterValue').value = '';
-            
+
             updatePreview();
         });
-        
+
         // Save report
         reportForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const name = document.getElementById('reportName').value;
             const reportType = document.getElementById('reportType').value;
-            
+
             // Get selected fields
             const fields = [];
             document.querySelectorAll('.report-fields input:checked').forEach(checkbox => {
                 fields.push(checkbox.value);
             });
-            
+
             // Get filters
             const filters = [];
             document.querySelectorAll('#activeFilters > div').forEach(filterDiv => {
@@ -229,13 +229,13 @@
                     value: filterDiv.dataset.value
                 });
             });
-            
+
             // Create configuration object
             const configuration = {
                 fields: fields,
                 filters: filters
             };
-            
+
             // Save report via AJAX
             fetch('{% url "save_report" %}', {
                 method: 'POST',
@@ -263,33 +263,33 @@
                 alert('An error occurred while saving the report');
             });
         });
-        
+
         // Update preview when fields change
         document.querySelectorAll('.report-fields input').forEach(checkbox => {
             checkbox.addEventListener('change', updatePreview);
         });
-        
+
         // Function to update preview
         function updatePreview() {
             const previewDiv = document.querySelector('.report-preview');
             const selectedFields = [];
-            
+
             document.querySelectorAll('.report-fields input:checked').forEach(checkbox => {
                 selectedFields.push(checkbox.value);
             });
-            
+
             if (selectedFields.length === 0) {
                 previewDiv.innerHTML = '<p class="text-center text-muted">Select at least one field to see a preview</p>';
                 return;
             }
-            
+
             // Create table header
             let tableHTML = '<div class="table-responsive"><table class="table"><thead><tr>';
             selectedFields.forEach(field => {
                 tableHTML += `<th>${field.replace('_', ' ').charAt(0).toUpperCase() + field.replace('_', ' ').slice(1)}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
-            
+
             // Add sample data rows
             for (let i = 0; i < 3; i++) {
                 tableHTML += '<tr>';
@@ -301,9 +301,9 @@
                     } else if (field === 'quantity') {
                         tableHTML += `<td>${Math.floor(Math.random() * 100)}</td>`;
                     } else if (field === 'price') {
-                        tableHTML += `<td>$${(Math.random() * 100).toFixed(2)}</td>`;
+                        tableHTML += `<td>₹${(Math.random() * 100).toFixed(2)}</td>`;
                     } else if (field === 'cost') {
-                        tableHTML += `<td>$${(Math.random() * 50).toFixed(2)}</td>`;
+                        tableHTML += `<td>₹${(Math.random() * 50).toFixed(2)}</td>`;
                     } else if (field === 'profit_margin') {
                         tableHTML += `<td>${(Math.random() * 50).toFixed(2)}%</td>`;
                     } else if (field === 'status') {
@@ -312,11 +312,11 @@
                 });
                 tableHTML += '</tr>';
             }
-            
+
             tableHTML += '</tbody></table></div>';
             previewDiv.innerHTML = tableHTML;
         }
-        
+
         // Initial preview update
         updatePreview();
     });

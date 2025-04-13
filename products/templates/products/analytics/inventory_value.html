@@ -33,7 +33,7 @@
                 <div class="card-body">
                     <div class="mb-4">
                         <h6 class="text-muted">Current Inventory Value</h6>
-                        <h3>${{ current_value|floatformat:2 }}</h3>
+                        <h3>₹{{ current_value|floatformat:2 }}</h3>
                     </div>
                     <div class="mb-4">
                         <h6 class="text-muted">Change ({{ days }} days)</h6>
@@ -57,7 +57,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const inventoryData = {{ inventory_data|safe }};
-        
+
         // Create inventory chart
         const ctx = document.getElementById('inventoryChart').getContext('2d');
         const inventoryChart = new Chart(ctx, {
@@ -65,7 +65,7 @@
             data: {
                 labels: inventoryData.dates,
                 datasets: [{
-                    label: 'Inventory Value ($)',
+                    label: 'Inventory Value (₹)',
                     data: inventoryData.values,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',

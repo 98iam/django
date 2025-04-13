@@ -43,9 +43,14 @@ class InventoryContext:
             currency_symbol = '$'  # Default
             if user and hasattr(user, 'profile'):
                 try:
-                    currency_symbol = get_currency_symbol(user.profile.currency)
+                    user_currency = user.profile.currency
+                    logger.info(f"User currency preference found: {user_currency}")
+                    currency_symbol = get_currency_symbol(user_currency)
+                    logger.info(f"Using currency symbol: {currency_symbol}")
                 except Exception as e:
                     logger.error(f"Error getting user currency symbol: {str(e)}")
+            else:
+                logger.warning(f"User profile not available, using default currency symbol: {currency_symbol}")
 
             return get_mock_product_info(currency_symbol)
 
@@ -149,9 +154,14 @@ class InventoryContext:
             currency_symbol = '$'  # Default
             if user and hasattr(user, 'profile'):
                 try:
-                    currency_symbol = get_currency_symbol(user.profile.currency)
+                    user_currency = user.profile.currency
+                    logger.info(f"User currency preference found: {user_currency}")
+                    currency_symbol = get_currency_symbol(user_currency)
+                    logger.info(f"Using currency symbol: {currency_symbol}")
                 except Exception as e:
                     logger.error(f"Error getting user currency symbol: {str(e)}")
+            else:
+                logger.warning(f"User profile not available, using default currency symbol: {currency_symbol}")
 
             return get_mock_inventory_summary(currency_symbol)
 
@@ -296,9 +306,14 @@ class InventoryContext:
             currency_symbol = '$'  # Default
             if user and hasattr(user, 'profile'):
                 try:
-                    currency_symbol = get_currency_symbol(user.profile.currency)
+                    user_currency = user.profile.currency
+                    logger.info(f"User currency preference found: {user_currency}")
+                    currency_symbol = get_currency_symbol(user_currency)
+                    logger.info(f"Using currency symbol: {currency_symbol}")
                 except Exception as e:
                     logger.error(f"Error getting user currency symbol: {str(e)}")
+            else:
+                logger.warning(f"User profile not available, using default currency symbol: {currency_symbol}")
 
             return get_mock_sales_analytics(currency_symbol)
 
@@ -475,9 +490,14 @@ class InventoryContext:
             currency_symbol = '$'  # Default
             if user and hasattr(user, 'profile'):
                 try:
-                    currency_symbol = get_currency_symbol(user.profile.currency)
+                    user_currency = user.profile.currency
+                    logger.info(f"User currency preference found: {user_currency}")
+                    currency_symbol = get_currency_symbol(user_currency)
+                    logger.info(f"Using currency symbol: {currency_symbol}")
                 except Exception as e:
                     logger.error(f"Error getting user currency symbol: {str(e)}")
+            else:
+                logger.warning(f"User profile not available, using default currency symbol: {currency_symbol}")
 
             # Use mock data instead of returning an error
             context = get_mock_inventory_summary(currency_symbol)
@@ -577,9 +597,14 @@ class InventoryContext:
                 currency_code = 'USD'  # Default
                 if user and hasattr(user, 'profile'):
                     try:
-                        currency_code = user.profile.currency
+                        user_currency = user.profile.currency
+                        logger.info(f"User currency preference found: {user_currency}")
+                        currency_code = user_currency
+                        logger.info(f"Using currency code: {currency_code}")
                     except Exception as e:
                         logger.error(f"Error getting user currency: {str(e)}")
+                else:
+                    logger.warning(f"User profile not available, using default currency code: {currency_code}")
 
                 value_info = "\nInventory Value Information:\n"
                 value_info += f"Total Inventory Value: {format_currency(total_value, currency_code)}\n"
@@ -647,9 +672,14 @@ class InventoryContext:
                     currency_code = 'USD'  # Default
                     if user and hasattr(user, 'profile'):
                         try:
-                            currency_code = user.profile.currency
+                            user_currency = user.profile.currency
+                            logger.info(f"User currency preference found: {user_currency}")
+                            currency_code = user_currency
+                            logger.info(f"Using currency code: {currency_code}")
                         except Exception as e:
                             logger.error(f"Error getting user currency: {str(e)}")
+                    else:
+                        logger.warning(f"User profile not available, using default currency code: {currency_code}")
 
                     category_info = f"\nProducts in Category '{category.name}':\n"
                     for product in category_products:

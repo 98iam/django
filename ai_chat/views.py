@@ -13,20 +13,28 @@ def chat_sidebar(request, session_id=None):
     Render the chat sidebar partial template.
     This is used for AJAX loading of the sidebar.
     If session_id is provided, render the chat interface for that session.
-    Otherwise, render the list of sessions.
+    Otherwise, get the most recent session or create a new one.
     """
     if session_id:
         # Render chat interface for specific session
         session = get_object_or_404(ChatSession, id=session_id, user=request.user)
-        messages = ChatMessage.objects.filter(session=session)
-        return render(request, 'ai_chat/sidebar_chat.html', {
-            'session': session,
-            'messages': messages
-        })
     else:
-        # Render list of sessions
-        sessions = ChatSession.objects.filter(user=request.user)
-        return render(request, 'ai_chat/sidebar.html', {'sessions': sessions})
+        # Get the most recent session or create a new one
+        sessions = ChatSession.objects.filter(user=request.user).order_by('-updated_at')
+        if sessions.exists():
+            session = sessions.first()
+        else:
+            # Create a new session
+            session = ChatSession.objects.create(user=request.user)
+
+    # Get messages for the session
+    messages = ChatMessage.objects.filter(session=session)
+
+    # Render chat interface
+    return render(request, 'ai_chat/sidebar_chat.html', {
+        'session': session,
+        'messages': messages
+    })
 
 @login_required
 def chat_session(request, session_id=None):

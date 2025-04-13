@@ -41,7 +41,7 @@
                                 {% for product, revenue in top_products %}
                                 <tr>
                                     <td>{{ product }}</td>
-                                    <td class="text-end">${{ revenue|floatformat:2 }}</td>
+                                    <td class="text-end">₹{{ revenue|floatformat:2 }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -72,7 +72,7 @@
                                 {% for product, revenue in bottom_products %}
                                 <tr>
                                     <td>{{ product }}</td>
-                                    <td class="text-end">${{ revenue|floatformat:2 }}</td>
+                                    <td class="text-end">₹{{ revenue|floatformat:2 }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -93,7 +93,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const performanceData = {{ performance_data|safe }};
-        
+
         // Create product performance chart
         const ctx = document.getElementById('productChart').getContext('2d');
         const productChart = new Chart(ctx, {

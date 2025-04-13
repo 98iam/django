@@ -79,16 +79,21 @@
                             {% endif %}
                             {{ product.quantity }}
                         </td>
-                        <td>${{ product.price }}</td>
+                        <td>₹{{ product.price|floatformat:2 }}</td>
                         <td>
                             <span class="badge {% if product.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
                                 {{ product.status }}
                             </span>
                         </td>
                         <td>
-                            <a href="{% url 'product_edit' product.pk %}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'product_edit' product.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}

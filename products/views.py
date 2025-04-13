@@ -3,12 +3,20 @@ from django.db.models import Sum, Count, F, Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .models import Product, Category, UserPreference
+from django.utils import timezone
+from datetime import timedelta
+import json
+from .models import Product, Category, UserPreference, Sale, SaleItem, InventorySnapshot
 from .forms import ProductForm, CategoryForm
 from .export import (
     export_products_csv, export_products_excel, export_products_pdf,
     export_categories_csv, export_categories_excel, export_categories_pdf
 )
+from .views_analytics import generate_demo_sales_data, generate_demo_inventory_data, generate_demo_performance_data, DecimalEncoder
+
+# Test view to check if server is running
+def test_view(request):
+    return HttpResponse("Server is running!")
 
 @login_required
 def dashboard(request):
@@ -40,6 +48,126 @@ def dashboard(request):
     if preference.is_widget_enabled('categories_with_counts'):
         widget_data['categories_with_counts'] = Category.objects.filter(user=request.user).annotate(
             product_count=Count('products')).order_by('-product_count')[:5]
+
+    # Add data for sales trends chart
+    if preference.is_widget_enabled('sales_trends_chart'):
+
+        # Get sales data for the last 30 days
+        days = 30
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=days)
+
+        # Get sales data
+        sales = Sale.objects.filter(
+            user=request.user,
+            sale_date__date__gte=start_date,
+            sale_date__date__lte=end_date
+        ).order_by('sale_date')
+
+        # For demo purposes, if no sales data exists, create some random data
+        if not sales.exists():
+            sales_data = generate_demo_sales_data(request.user, days)
+        else:
+            # Group sales by date
+            sales_by_date = {}
+            for sale in sales:
+                date_str = sale.sale_date.date().strftime('%Y-%m-%d')
+                if date_str in sales_by_date:
+                    sales_by_date[date_str] += sale.total_amount
+                else:
+                    sales_by_date[date_str] = sale.total_amount
+
+            # Create a list of dates and corresponding sales amounts
+            dates = []
+            amounts = []
+            current_date = start_date
+            while current_date <= end_date:
+                date_str = current_date.strftime('%Y-%m-%d')
+                dates.append(date_str)
+                amounts.append(float(sales_by_date.get(date_str, 0)))
+                current_date += timedelta(days=1)
+
+            sales_data = {
+                'dates': dates,
+                'amounts': amounts
+            }
+
+        widget_data['sales_trends_chart'] = json.dumps(sales_data)
+
+    # Add data for inventory value chart
+    if preference.is_widget_enabled('inventory_value_chart'):
+
+        # Get inventory data for the last 30 days
+        days = 30
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=days)
+
+        # Get inventory snapshots
+        snapshots = InventorySnapshot.objects.filter(
+            user=request.user,
+            date__gte=start_date,
+            date__lte=end_date
+        ).order_by('date')
+
+        # For demo purposes, if no snapshot data exists, create some random data
+        if not snapshots.exists():
+            inventory_data = generate_demo_inventory_data(request.user, days)
+        else:
+            # Create a dictionary of dates and values
+            inventory_by_date = {snapshot.date.strftime('%Y-%m-%d'): float(snapshot.total_value) for snapshot in snapshots}
+
+            # Create a list of dates and corresponding inventory values
+            dates = []
+            values = []
+            current_date = start_date
+            while current_date <= end_date:
+                date_str = current_date.strftime('%Y-%m-%d')
+                dates.append(date_str)
+                values.append(inventory_by_date.get(date_str, 0))
+                current_date += timedelta(days=1)
+
+            inventory_data = {
+                'dates': dates,
+                'values': values
+            }
+
+        widget_data['inventory_value_chart'] = json.dumps(inventory_data, cls=DecimalEncoder)
+
+    # Add data for product performance chart
+    if preference.is_widget_enabled('product_performance_chart'):
+
+        # Get products
+        products = Product.objects.filter(user=request.user)
+
+        # For demo purposes, if no sales data exists, create some random data
+        if not SaleItem.objects.filter(product__user=request.user).exists():
+            performance_data = generate_demo_performance_data(products)
+        else:
+            # Get sales data for each product
+            product_sales = {}
+            for product in products:
+                sales_count = SaleItem.objects.filter(product=product).aggregate(
+                    total_quantity=Sum('quantity'),
+                    total_revenue=Sum(F('quantity') * F('price'))
+                )
+                product_sales[product.id] = {
+                    'name': product.name,
+                    'quantity': sales_count['total_quantity'] or 0,
+                    'revenue': float(sales_count['total_revenue'] or 0),
+                    'profit_margin': product.profit_margin
+                }
+
+            # Sort products by revenue
+            sorted_products = sorted(product_sales.values(), key=lambda x: x['revenue'], reverse=True)[:10]
+
+            performance_data = {
+                'products': [p['name'] for p in sorted_products],
+                'quantities': [p['quantity'] for p in sorted_products],
+                'revenues': [p['revenue'] for p in sorted_products],
+                'margins': [p['profit_margin'] for p in sorted_products]
+            }
+
+        widget_data['product_performance_chart'] = json.dumps(performance_data, cls=DecimalEncoder)
 
     # Get ordered widgets for display
     ordered_widgets = preference.get_ordered_widgets()
@@ -142,6 +270,19 @@ def product_edit(request, pk):
     else:
         form = ProductForm(instance=product)
     return render(request, 'products/product_form.html', {'form': form, 'title': 'Edit Product'})
+
+@login_required
+def product_delete(request, pk):
+    # Ensure the product belongs to the current user
+    product = get_object_or_404(Product, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        product_name = product.name
+        product.delete()
+        messages.success(request, f'Product "{product_name}" deleted successfully.')
+        return redirect('product_list')
+
+    return render(request, 'products/product_confirm_delete.html', {'product': product})
 
 @login_required
 def category_list(request):

@@ -6,9 +6,14 @@
 {% if show_customize_button %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Dashboard</h2>
-    <a href="{% url 'dashboard_settings' %}" class="btn btn-outline-primary">
-        <i class="fas fa-cog"></i> Customize Dashboard
-    </a>
+    <div>
+        <a href="{% url 'reset_dashboard' %}" class="btn btn-outline-danger me-2">
+            <i class="fas fa-undo"></i> Reset Dashboard
+        </a>
+        <a href="{% url 'dashboard_settings' %}" class="btn btn-outline-primary">
+            <i class="fas fa-cog"></i> Customize Dashboard
+        </a>
+    </div>
 </div>
 {% endif %}
 
@@ -55,7 +60,7 @@
                 <div class="card bg-info text-white h-100">
                     <div class="card-body">
                         <h5 class="card-title">Total Inventory Value</h5>
-                        <h2>${{ widget_data.total_value|floatformat:2 }}</h2>
+                        <h2>₹{{ widget_data.total_value|floatformat:2 }}</h2>
                     </div>
                 </div>
             </div>
@@ -79,7 +84,7 @@
                                     <h6 class="mb-1">{{ product.name }}</h6>
                                     <small>{{ product.created_at|date }}</small>
                                 </div>
-                                <p class="mb-1">Qty: {{ product.quantity }} | ${{ product.price }}</p>
+                                <p class="mb-1">Qty: {{ product.quantity }} | ₹{{ product.price|floatformat:2 }}</p>
                             </a>
                             {% empty %}
                             <p class="text-muted">No products added yet.</p>
@@ -113,6 +118,58 @@
                 </div>
             </div>
         {% endif %}
+
+        {% if widget_id == 'sales_trends_chart' and widget_data.sales_trends_chart %}
+            <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Sales Trends</h5>
+                        <a href="{% url 'sales_trends' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="dashboardSalesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if widget_id == 'inventory_value_chart' and widget_data.inventory_value_chart %}
+            <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Inventory Value</h5>
+                        <a href="{% url 'inventory_value' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="dashboardInventoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="row">
+    {% for widget_id, config in ordered_widgets %}
+        {% if widget_id == 'product_performance_chart' and widget_data.product_performance_chart %}
+            <div class="col-md-12 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Product Performance</h5>
+                        <a href="{% url 'product_performance' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="dashboardProductChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     {% endfor %}
 </div>
 
@@ -122,4 +179,186 @@
     <p>You have disabled all dashboard widgets. <a href="{% url 'dashboard_settings' %}" class="alert-link">Go to dashboard settings</a> to enable some widgets.</p>
 </div>
 {% endif %}
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Sales Trends Chart
+        const salesChartElement = document.getElementById('dashboardSalesChart');
+        if (salesChartElement) {
+            const salesData = {{ widget_data.sales_trends_chart|safe }};
+            if (salesData && salesData.dates && salesData.amounts) {
+                new Chart(salesChartElement, {
+                    type: 'line',
+                    data: {
+                        labels: salesData.dates,
+                        datasets: [{
+                            label: 'Sales',
+                            data: salesData.amounts,
+                            borderColor: '#4e73df',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#4e73df',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            pointRadius: 3,
+                            fill: true,
+                            tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 7
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            }
+        }
+
+        // Initialize Inventory Value Chart
+        const inventoryChartElement = document.getElementById('dashboardInventoryChart');
+        if (inventoryChartElement) {
+            const inventoryData = {{ widget_data.inventory_value_chart|safe }};
+            if (inventoryData && inventoryData.dates && inventoryData.values) {
+                new Chart(inventoryChartElement, {
+                    type: 'line',
+                    data: {
+                        labels: inventoryData.dates,
+                        datasets: [{
+                            label: 'Inventory Value',
+                            data: inventoryData.values,
+                            borderColor: '#1cc88a',
+                            backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#1cc88a',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 1,
+                            pointRadius: 3,
+                            fill: true,
+                            tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxTicksLimit: 7
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            }
+        }
+
+        // Initialize Product Performance Chart
+        const productChartElement = document.getElementById('dashboardProductChart');
+        if (productChartElement) {
+            const performanceData = {{ widget_data.product_performance_chart|safe }};
+            if (performanceData && performanceData.products && performanceData.revenues) {
+                new Chart(productChartElement, {
+                    type: 'bar',
+                    data: {
+                        labels: performanceData.products,
+                        datasets: [{
+                            label: 'Revenue',
+                            data: performanceData.revenues,
+                            backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            }
+        }
+    });
+</script>
 {% endblock %}

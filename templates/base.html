@@ -165,13 +165,35 @@
             function loadChatSidebar(sessionId = null) {
                 let url = sessionId ? `{% url "chat_sidebar" %}${sessionId}/` : '{% url "chat_sidebar" %}';
 
+                // Always load a chat session, not the session list
                 fetch(url)
                     .then(response => response.text())
                     .then(html => {
                         chatSidebarContent.innerHTML = html;
 
-                        // If we're showing the sessions list
-                        if (!sessionId) {
+                        // Add event listener to new chat button (works in both views)
+                        const newChatBtn = document.getElementById('newChatBtn');
+                        if (newChatBtn) {
+                            newChatBtn.addEventListener('click', function() {
+                                // Create a new chat session via AJAX
+                                fetch('{% url "chat_session" %}', {
+                                    method: 'GET',
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success && data.session_id) {
+                                        // Load the new chat session in the sidebar
+                                        loadChatSidebar(data.session_id);
+                                    }
+                                });
+                            });
+                        }
+
+                        // If we're showing the sessions list (this code won't run anymore with our changes)
+                        if (false && !sessionId) { // Adding false to disable this block
                             // Add event listeners to delete buttons
                             document.querySelectorAll('.delete-session').forEach(button => {
                                 button.addEventListener('click', function(e) {
@@ -195,29 +217,10 @@
                                     });
                                 });
                             });
+                        }
 
-                            // Add event listener to new chat button
-                            const newChatBtn = document.getElementById('newChatBtn');
-                            if (newChatBtn) {
-                                newChatBtn.addEventListener('click', function() {
-                                    // Create a new chat session via AJAX
-                                    fetch('{% url "chat_session" %}', {
-                                        method: 'GET',
-                                        headers: {
-                                            'X-Requested-With': 'XMLHttpRequest'
-                                        }
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success && data.session_id) {
-                                            // Load the new chat session in the sidebar
-                                            loadChatSidebar(data.session_id);
-                                        }
-                                    });
-                                });
-                            }
-
-                            // Add event listeners to chat session links
+                        // Add event listeners to chat session links (this code won't run anymore with our changes)
+                        if (false && !sessionId) {
                             document.querySelectorAll('.chat-session-item a').forEach(link => {
                                 link.addEventListener('click', function(e) {
                                     e.preventDefault();
@@ -230,150 +233,149 @@
                                     loadChatSidebar(sessionId);
                                 });
                             });
-                        } else {
-                            // We're showing a chat session
+                        }
 
-                            // Add event listener to back button
-                            const backBtn = document.getElementById('backToSessionsBtn');
-                            if (backBtn) {
-                                backBtn.addEventListener('click', function() {
-                                    loadChatSidebar(); // Go back to sessions list
-                                });
-                            }
+                        // We're showing a chat session
+                        // Add event listener to back button (now it's the New Chat button)
+                        const backBtn = document.getElementById('backToSessionsBtn');
+                        if (backBtn) {
+                            backBtn.addEventListener('click', function() {
+                                loadChatSidebar(); // Go back to sessions list
+                            });
+                        }
 
-                            // Add event listener to delete button
-                            const deleteBtn = document.querySelector('.delete-session-btn');
-                            if (deleteBtn) {
-                                deleteBtn.addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    const sessionId = this.getAttribute('data-session-id');
+                        // Add event listener to delete button
+                        const deleteBtn = document.querySelector('.delete-session-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const sessionId = this.getAttribute('data-session-id');
 
-                                    if (confirm('Are you sure you want to delete this chat session?')) {
-                                        fetch(`{% url "delete_session" 0 %}`.replace('0', sessionId), {
-                                            method: 'POST',
-                                            headers: {
-                                                'X-Requested-With': 'XMLHttpRequest',
-                                                'X-CSRFToken': '{{ csrf_token }}'
-                                            }
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                loadChatSidebar(); // Go back to sessions list
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            // Add event listener to edit title button
-                            const editTitleBtn = document.querySelector('.edit-title-btn');
-                            if (editTitleBtn) {
-                                editTitleBtn.addEventListener('click', function(e) {
-                                    e.preventDefault();
-                                    const sessionId = this.getAttribute('data-session-id');
-                                    const currentTitle = document.querySelector('.sidebar-header h5').textContent.trim();
-                                    const newTitle = prompt('Enter a new title for this chat:', currentTitle);
-
-                                    if (newTitle && newTitle !== currentTitle) {
-                                        fetch(`{% url "update_title" 0 %}`.replace('0', sessionId), {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-Requested-With': 'XMLHttpRequest',
-                                                'X-CSRFToken': '{{ csrf_token }}'
-                                            },
-                                            body: JSON.stringify({ title: newTitle })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                // Update the title in the UI
-                                                document.querySelector('.sidebar-header h5').textContent = newTitle;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-                            // Add event listener to chat form
-                            const chatForm = document.getElementById('sidebarChatForm');
-                            if (chatForm) {
-                                chatForm.addEventListener('submit', function(e) {
-                                    e.preventDefault();
-                                    const messageInput = document.getElementById('sidebarMessageInput');
-                                    const message = messageInput.value.trim();
-                                    const sessionId = this.getAttribute('data-session-id');
-
-                                    if (!message) return;
-
-                                    // Clear input
-                                    messageInput.value = '';
-
-                                    // Add user message to chat
-                                    addMessage(message, true);
-
-                                    // Add loading indicator
-                                    const messagesContainer = document.getElementById('sidebarChatMessages');
-                                    const loadingDiv = document.createElement('div');
-                                    loadingDiv.className = 'message assistant-message loading';
-                                    loadingDiv.innerHTML = `
-                                        <div class="message-content">
-                                            <div class="message-header">
-                                                <strong>AI Assistant</strong>
-                                            </div>
-                                            <div class="message-text">
-                                                <div class="typing-indicator">
-                                                    <span></span>
-                                                    <span></span>
-                                                    <span></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                    messagesContainer.appendChild(loadingDiv);
-                                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-                                    // Send message to server
-                                    fetch('{% url "send_message" %}', {
+                                if (confirm('Are you sure you want to delete this chat session?')) {
+                                    fetch(`{% url "delete_session" 0 %}`.replace('0', sessionId), {
                                         method: 'POST',
                                         headers: {
-                                            'Content-Type': 'application/json',
+                                            'X-Requested-With': 'XMLHttpRequest',
                                             'X-CSRFToken': '{{ csrf_token }}'
-                                        },
-                                        body: JSON.stringify({
-                                            message: message,
-                                            session_id: sessionId
-                                        })
+                                        }
                                     })
                                     .then(response => response.json())
                                     .then(data => {
-                                        // Remove loading indicator
-                                        messagesContainer.removeChild(loadingDiv);
-
                                         if (data.success) {
-                                            // Add AI response to chat
-                                            addMessage(data.ai_message.content, false);
-                                        } else {
-                                            // Show error
-                                            addMessage('Error: ' + (data.error || 'Failed to get response'), false);
+                                            loadChatSidebar(); // Go back to sessions list
                                         }
-                                    })
-                                    .catch(error => {
-                                        // Remove loading indicator
-                                        messagesContainer.removeChild(loadingDiv);
-
-                                        // Show error
-                                        addMessage('Error: ' + error.message, false);
                                     });
-                                });
-                            }
+                                }
+                            });
+                        }
 
-                            // Scroll to bottom of chat
-                            const messagesContainer = document.getElementById('sidebarChatMessages');
-                            if (messagesContainer) {
+                        // Add event listener to edit title button
+                        const editTitleBtn = document.querySelector('.edit-title-btn');
+                        if (editTitleBtn) {
+                            editTitleBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const sessionId = this.getAttribute('data-session-id');
+                                const currentTitle = document.querySelector('.sidebar-header h5').textContent.trim();
+                                const newTitle = prompt('Enter a new title for this chat:', currentTitle);
+
+                                if (newTitle && newTitle !== currentTitle) {
+                                    fetch(`{% url "update_title" 0 %}`.replace('0', sessionId), {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        body: JSON.stringify({ title: newTitle })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            // Update the title in the UI
+                                            document.querySelector('.sidebar-header h5').textContent = newTitle;
+                                        }
+                                    });
+                                }
+                            });
+                        }
+
+                        // Add event listener to chat form
+                        const chatForm = document.getElementById('sidebarChatForm');
+                        if (chatForm) {
+                            chatForm.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                const messageInput = document.getElementById('sidebarMessageInput');
+                                const message = messageInput.value.trim();
+                                const sessionId = this.getAttribute('data-session-id');
+
+                                if (!message) return;
+
+                                // Clear input
+                                messageInput.value = '';
+
+                                // Add user message to chat
+                                addMessage(message, true);
+
+                                // Add loading indicator
+                                const messagesContainer = document.getElementById('sidebarChatMessages');
+                                const loadingDiv = document.createElement('div');
+                                loadingDiv.className = 'message assistant-message loading';
+                                loadingDiv.innerHTML = `
+                                    <div class="message-content">
+                                        <div class="message-header">
+                                            <strong>AI Assistant</strong>
+                                        </div>
+                                        <div class="message-text">
+                                            <div class="typing-indicator">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                messagesContainer.appendChild(loadingDiv);
                                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                            }
+
+                                // Send message to server
+                                fetch('{% url "send_message" %}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    body: JSON.stringify({
+                                        message: message,
+                                        session_id: sessionId
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Remove loading indicator
+                                    messagesContainer.removeChild(loadingDiv);
+
+                                    if (data.success) {
+                                        // Add AI response to chat
+                                        addMessage(data.ai_message.content, false);
+                                    } else {
+                                        // Show error
+                                        addMessage('Error: ' + (data.error || 'Failed to get response'), false);
+                                    }
+                                })
+                                .catch(error => {
+                                    // Remove loading indicator
+                                    messagesContainer.removeChild(loadingDiv);
+
+                                    // Show error
+                                    addMessage('Error: ' + error.message, false);
+                                });
+                            });
+                        }
+
+                        // Scroll to bottom of chat
+                        const messagesContainer = document.getElementById('sidebarChatMessages');
+                        if (messagesContainer) {
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
                         }
                     });
             }

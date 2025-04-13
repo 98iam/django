@@ -27,6 +27,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# If you encounter any dependency issues, try installing with the --no-deps flag and then install dependencies separately
+# pip install --no-deps -r requirements.txt
+
 # Copy example environment file and edit with your values
 cp .env.example .env
 # Edit .env with your database credentials and Gemini API key
@@ -48,18 +51,18 @@ Then visit http://localhost:8000 in your browser.
 
 ## Features
 
-- Product management with detailed information
+- Product management with detailed information (including add, edit, and delete functionality)
 - Category organization
 - Stock level tracking with status indicators
 - Admin interface for easy management
 - Secure authentication system with Supabase integration
 - Multi-user support with data isolation
-- Dashboard analytics with interactive charts
+- Dashboard analytics with interactive charts (sales trends, inventory value, product performance)
 - Dark mode support for better visibility
 - Customizable reports
 - Export functionality (CSV, Excel, PDF)
 - Dashboard widget customization
-- AI Chat Assistant powered by Google Gemini
+- AI Chat Assistant powered by Google Gemini (with direct chat interface)
 
 ## Tech Stack
 
@@ -126,9 +129,10 @@ This project uses PostgreSQL with Supabase by default, but you can modify the se
 
 1. Make sure you've set up your Gemini API key in the `.env` file
 2. Click on the robot icon in the navigation bar to open the chat sidebar
-3. Create a new chat session or select an existing one
+3. The chat interface will open directly, showing a new or existing chat session
 4. Type your questions about inventory management or how to use the system
 5. You can chat directly in the sidebar or open the chat in a full page by clicking the menu (⋮) and selecting "Open in full page"
+6. To start a new chat, click the "New Chat" button at the top of the sidebar
 
 ## Contributing
 
@@ -141,6 +145,7 @@ The system includes comprehensive analytics capabilities:
 - **Sales Trends**: Interactive charts showing sales over time (daily, weekly, monthly)
 - **Inventory Value Tracking**: Monitor how your inventory value changes over time
 - **Product Performance Metrics**: Identify your best and worst-selling products
+- **Dashboard Integration**: All charts are available directly on the dashboard for quick insights
 - **Customizable Reports**: Create and save custom reports for your specific needs
 - **Data Export**: Export data in various formats (CSV, Excel, PDF)
 
@@ -175,6 +180,7 @@ The system includes an AI chat assistant powered by Google Gemini:
    - Access user-specific inventory data (the AI only shows products belonging to the current user)
    - Get detailed product information, inventory summaries, and sales analytics
    - Chat directly in the sidebar or expand to a full-page view
+   - Direct chat interface that opens immediately when clicking the chat icon
 
 3. **How It Works**:
    - The AI assistant has access to your inventory data in real-time
@@ -202,6 +208,41 @@ The system includes an AI chat assistant powered by Google Gemini:
 
 - Make sure you've run `python manage.py collectstatic`
 - Check that `DEBUG=True` in your `.env` file during development
+
+### Dependency Installation Issues
+
+- If you encounter conflicts during installation, try using a fresh virtual environment
+- For specific package issues, you can install them individually:
+  ```
+  pip install package-name==version
+  ```
+- Some packages might require system-level dependencies. On Ubuntu/Debian:
+  ```
+  sudo apt-get install python3-dev libpq-dev
+  ```
+  On Windows, you might need to install Visual C++ Build Tools
+- If you're having issues with psycopg2-binary, you can try using psycopg2 instead (requires PostgreSQL to be installed)
+
+## Version Control
+
+This project uses Git for version control. To initialize the repository and make your first commit:
+
+```bash
+# Initialize Git repository
+git init
+
+# Add all files to staging
+git add .
+
+# Make initial commit
+git commit -m "Initial commit: Inventory Management System with AI Chat"
+
+# Add a remote repository (replace with your own repository URL)
+git remote add origin https://github.com/yourusername/inventory-management.git
+
+# Push to remote repository
+git push -u origin main
+```
 
 ## License
 
