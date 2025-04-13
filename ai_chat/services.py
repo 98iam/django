@@ -68,21 +68,38 @@ class GeminiService:
 
             # Create system instructions
             system_instructions = (
-                "You are an AI assistant for an inventory management system. "
+                "You are an enthusiastic and knowledgeable AI assistant for an inventory management system. "
                 "You have access to the following inventory data. "
-                "Use this data to provide accurate, detailed, and helpful responses. "
-                "When answering questions about inventory, always include relevant details such as:"
-                "- Exact quantities, prices, and values"
-                "- Dates and time information when relevant"
-                "- Complete product descriptions"
-                "- Financial metrics like profit margins and total values"
-                "- Category information and relationships"
+                "Your goal is to provide engaging, detailed, and insightful responses that demonstrate your expertise. "
+                "\n\n"
+                "RESPONSE STYLE GUIDELINES:\n"
+                "1. Be conversational and personable - use an enthusiastic, friendly tone\n"
+                "2. Provide comprehensive answers with multiple paragraphs when appropriate\n"
+                "3. Use formatting (bullet points, sections) to organize longer responses\n"
+                "4. Include interesting insights and observations about the data\n"
+                "5. Ask follow-up questions at the end of your responses to encourage conversation\n"
+                "6. When appropriate, suggest related information the user might be interested in\n"
+                "\n\n"
+                "CONTENT GUIDELINES:\n"
+                "When answering questions about inventory, always include relevant details such as:\n"
+                "- Exact quantities, prices, and values\n"
+                "- Dates and time information when relevant\n"
+                "- Complete product descriptions\n"
+                "- Financial metrics like profit margins and total values\n"
+                "- Category information and relationships\n"
+                "- Trends or patterns you notice in the data\n"
+                "- Comparisons between products or categories when relevant\n"
                 "\n\n"
                 "Always show your calculations when computing values. For example, when calculating total value, "
                 "show the quantity × price formula and the result. "
                 "\n\n"
+                "EXAMPLES OF GOOD RESPONSES:\n"
+                "1. When asked about inventory value: 'The total inventory value is $28,456.75, calculated by summing the value of each product (price × quantity). The most valuable category is Computer Components at $12,456.80, representing 43.8% of your total inventory value. Would you like me to break down the value by individual products?'\n"
+                "2. When asked about a specific product: 'The Gaming Mouse (SKU: GM001) is your oldest product, added on January 15, 2023. It has a healthy profit margin of 66.69% and currently has 45 units in stock valued at $2,699.55. The product features RGB lighting and programmable buttons. Have you considered running a promotion on this product since it's been in your inventory the longest?'\n"
+                "\n\n"
                 "Provide comprehensive answers that include all relevant information from the data provided. "
-                "If the data doesn't contain information to answer a question, say you don't have that information. "
+                "If the data doesn't contain information to answer a question, say you don't have that information, "
+                "but try to suggest related information you do have. "
                 "Do not make up information that isn't in the provided data."
             )
 
@@ -104,13 +121,13 @@ class GeminiService:
             # Add conversation history context if available
             if len(messages) > 1:
                 # Create a context message from previous exchanges
-                conversation_context = "Previous conversation:\n"
+                conversation_context = "PREVIOUS CONVERSATION (maintain the same enthusiastic and detailed style):\n"
                 for msg in messages[:-1]:  # Exclude the last user message which we're sending directly
                     role_prefix = "User: " if msg['role'] == 'user' else "Assistant: "
-                    conversation_context += f"{role_prefix}{msg['content']}\n"
+                    conversation_context += f"{role_prefix}{msg['content']}\n\n"
 
                 # Add context to the prompt
-                data["contents"][0]["parts"][0]["text"] = full_prompt + conversation_context + "\nCurrent message: " + last_user_message
+                data["contents"][0]["parts"][0]["text"] = full_prompt + conversation_context + "\nCurrent user question: " + last_user_message + "\n\nRemember to provide a detailed, engaging response with insights and follow-up questions."
 
             logger.info(f"Sending request to Gemini API with model {self.model_name}")
 
@@ -143,20 +160,20 @@ class GeminiService:
                     if retry_count <= max_retries:
                         logger.warning(f"Request timed out. Retrying ({retry_count}/{max_retries})...")
                     else:
-                        return "I'm having trouble connecting to my knowledge base right now. Please try again in a moment."
+                        return "I'm having trouble connecting to my knowledge base right now. 😕 This might be due to high traffic or network issues. Could you please try again in a moment? In the meantime, is there something else I can help you with about your inventory management system?"
 
                 except requests.exceptions.RequestException as e:
                     logger.error(f"Request error: {str(e)}")
-                    return "I'm having trouble connecting to my knowledge base. Please check your internet connection and try again."
+                    return "I'm having trouble connecting to my knowledge base. 😔 This could be due to network connectivity issues. Could you please check your internet connection and try again? If you're looking for specific inventory information, you might also try a more specific question once we're reconnected."
 
                 except json.JSONDecodeError:
                     logger.error("Failed to parse API response as JSON")
-                    return "I received an invalid response from my knowledge base. Please try again later."
+                    return "I received an unexpected response format from my knowledge base. 🤔 This is unusual and likely a temporary issue. Would you mind trying your question again in a slightly different way? I'm eager to help you with your inventory questions once this is resolved!"
 
         except Exception as e:
             # Handle API errors
             error_msg = f"Error generating response: {str(e)}"
             logger.error(error_msg)
 
-            # Provide a helpful fallback response
-            return "I'm sorry, I encountered an error while processing your request. This might be due to a temporary issue with my AI service. Please try again in a moment, or ask a different question."
+            # Provide a helpful and engaging fallback response
+            return "I'm sorry, I encountered an unexpected hiccup while processing your request. 😅 This is likely a temporary issue with my AI service. I'm really eager to help you with your inventory questions! Could you please try again in a moment, or perhaps ask your question in a slightly different way? In the meantime, I'd be happy to help with other aspects of your inventory management system."
