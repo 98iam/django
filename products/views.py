@@ -18,6 +18,10 @@ from .views_analytics import generate_demo_sales_data, generate_demo_inventory_d
 def test_view(request):
     return HttpResponse("Server is running!")
 
+# Test view for Chart.js
+def test_chart(request):
+    return render(request, 'products/test_chart.html')
+
 @login_required
 def dashboard(request):
     # Get user preferences for dashboard widgets
@@ -92,7 +96,16 @@ def dashboard(request):
                 'amounts': amounts
             }
 
-        widget_data['sales_trends_chart'] = json.dumps(sales_data)
+        try:
+            # Ensure the data is properly formatted
+            for i, amount in enumerate(sales_data['amounts']):
+                sales_data['amounts'][i] = float(amount)
+
+            widget_data['sales_trends_chart'] = json.dumps(sales_data, cls=DecimalEncoder)
+            print("Sales trends chart data:", widget_data['sales_trends_chart'][:100], "...")
+        except Exception as e:
+            print(f"Error serializing sales data: {e}")
+            widget_data['sales_trends_chart'] = 'null'
 
     # Add data for inventory value chart
     if preference.is_widget_enabled('inventory_value_chart'):
@@ -131,7 +144,16 @@ def dashboard(request):
                 'values': values
             }
 
-        widget_data['inventory_value_chart'] = json.dumps(inventory_data, cls=DecimalEncoder)
+        try:
+            # Ensure the data is properly formatted
+            for i, value in enumerate(inventory_data['values']):
+                inventory_data['values'][i] = float(value)
+
+            widget_data['inventory_value_chart'] = json.dumps(inventory_data, cls=DecimalEncoder)
+            print("Inventory value chart data:", widget_data['inventory_value_chart'][:100], "...")
+        except Exception as e:
+            print(f"Error serializing inventory data: {e}")
+            widget_data['inventory_value_chart'] = 'null'
 
     # Add data for product performance chart
     if preference.is_widget_enabled('product_performance_chart'):
@@ -167,10 +189,33 @@ def dashboard(request):
                 'margins': [p['profit_margin'] for p in sorted_products]
             }
 
-        widget_data['product_performance_chart'] = json.dumps(performance_data, cls=DecimalEncoder)
+        try:
+            # Ensure the data is properly formatted
+            for i, revenue in enumerate(performance_data['revenues']):
+                performance_data['revenues'][i] = float(revenue)
+            for i, margin in enumerate(performance_data['margins']):
+                performance_data['margins'][i] = float(margin)
+
+            widget_data['product_performance_chart'] = json.dumps(performance_data, cls=DecimalEncoder)
+            print("Product performance chart data:", widget_data['product_performance_chart'][:100], "...")
+        except Exception as e:
+            print(f"Error serializing performance data: {e}")
+            widget_data['product_performance_chart'] = 'null'
 
     # Get ordered widgets for display
     ordered_widgets = preference.get_ordered_widgets()
+
+    # Debug: Print widget data and ordered widgets
+    print("Widget data keys:", widget_data.keys())
+    print("Ordered widgets:", [w[0] for w in ordered_widgets])
+
+    # Force-enable chart widgets for debugging
+    if 'sales_trends_chart' not in widget_data and preference.is_widget_enabled('sales_trends_chart'):
+        print("Sales trends chart is enabled but data is missing")
+    if 'inventory_value_chart' not in widget_data and preference.is_widget_enabled('inventory_value_chart'):
+        print("Inventory value chart is enabled but data is missing")
+    if 'product_performance_chart' not in widget_data and preference.is_widget_enabled('product_performance_chart'):
+        print("Product performance chart is enabled but data is missing")
 
     context = {
         'widget_data': widget_data,

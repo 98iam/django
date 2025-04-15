@@ -119,7 +119,7 @@
             </div>
         {% endif %}
 
-        {% if widget_id == 'sales_trends_chart' and widget_data.sales_trends_chart %}
+        {% if widget_id == 'sales_trends_chart' %}
             <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -129,13 +129,16 @@
                     <div class="card-body">
                         <div class="chart-container" style="height: 250px;">
                             <canvas id="dashboardSalesChart"></canvas>
+                            <div id="salesChartFallback" class="text-center mt-5" style="display: none;">
+                                <p class="text-muted">No sales data available to display chart.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         {% endif %}
 
-        {% if widget_id == 'inventory_value_chart' and widget_data.inventory_value_chart %}
+        {% if widget_id == 'inventory_value_chart' %}
             <div class="col-md-6 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -145,6 +148,9 @@
                     <div class="card-body">
                         <div class="chart-container" style="height: 250px;">
                             <canvas id="dashboardInventoryChart"></canvas>
+                            <div id="inventoryChartFallback" class="text-center mt-5" style="display: none;">
+                                <p class="text-muted">No inventory data available to display chart.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,7 +161,7 @@
 
 <div class="row">
     {% for widget_id, config in ordered_widgets %}
-        {% if widget_id == 'product_performance_chart' and widget_data.product_performance_chart %}
+        {% if widget_id == 'product_performance_chart' %}
             <div class="col-md-12 mb-4 dashboard-widget" data-widget-id="{{ widget_id }}">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -165,6 +171,9 @@
                     <div class="card-body">
                         <div class="chart-container" style="height: 300px;">
                             <canvas id="dashboardProductChart"></canvas>
+                            <div id="productChartFallback" class="text-center mt-5" style="display: none;">
+                                <p class="text-muted">No product performance data available to display chart.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,11 +195,24 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Sales Trends Chart
-        const salesChartElement = document.getElementById('dashboardSalesChart');
-        if (salesChartElement) {
-            const salesData = {{ widget_data.sales_trends_chart|safe }};
-            if (salesData && salesData.dates && salesData.amounts) {
+        console.log('DOM content loaded');
+
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded!');
+            return;
+        }
+
+        console.log('Chart.js is loaded successfully');
+
+        // Sales Trends Chart
+        {% if widget_data.sales_trends_chart %}
+        try {
+            const salesChartElement = document.getElementById('dashboardSalesChart');
+            if (salesChartElement) {
+                const salesData = {{ widget_data.sales_trends_chart|safe }};
+                console.log('Creating sales chart with data:', salesData);
+
                 new Chart(salesChartElement, {
                     type: 'line',
                     data: {
@@ -207,51 +229,59 @@
                             pointRadius: 3,
                             fill: true,
                             tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        }
+                        }]
                     },
-                    scales: {
-                        x: {
-                            grid: {
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
                                 display: false
                             },
-                            ticks: {
-                                maxTicksLimit: 7
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹' + context.parsed.y.toFixed(2);
+                                    }
+                                }
                             }
                         },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+                console.log('Sales chart created successfully');
             }
+        } catch (e) {
+            console.error('Error creating sales chart:', e);
+            document.getElementById('salesChartFallback').style.display = 'block';
         }
+        {% endif %}
 
-        // Initialize Inventory Value Chart
-        const inventoryChartElement = document.getElementById('dashboardInventoryChart');
-        if (inventoryChartElement) {
-            const inventoryData = {{ widget_data.inventory_value_chart|safe }};
-            if (inventoryData && inventoryData.dates && inventoryData.values) {
+        // Inventory Value Chart
+        {% if widget_data.inventory_value_chart %}
+        try {
+            const inventoryChartElement = document.getElementById('dashboardInventoryChart');
+            if (inventoryChartElement) {
+                const inventoryData = {{ widget_data.inventory_value_chart|safe }};
+                console.log('Creating inventory chart with data:', inventoryData);
+
                 new Chart(inventoryChartElement, {
                     type: 'line',
                     data: {
@@ -268,51 +298,59 @@
                             pointRadius: 3,
                             fill: true,
                             tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        }
+                        }]
                     },
-                    scales: {
-                        x: {
-                            grid: {
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
                                 display: false
                             },
-                            ticks: {
-                                maxTicksLimit: 7
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹' + context.parsed.y.toFixed(2);
+                                    }
+                                }
                             }
                         },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+                console.log('Inventory chart created successfully');
             }
+        } catch (e) {
+            console.error('Error creating inventory chart:', e);
+            document.getElementById('inventoryChartFallback').style.display = 'block';
         }
+        {% endif %}
 
-        // Initialize Product Performance Chart
-        const productChartElement = document.getElementById('dashboardProductChart');
-        if (productChartElement) {
-            const performanceData = {{ widget_data.product_performance_chart|safe }};
-            if (performanceData && performanceData.products && performanceData.revenues) {
+        // Product Performance Chart
+        {% if widget_data.product_performance_chart %}
+        try {
+            const productChartElement = document.getElementById('dashboardProductChart');
+            if (productChartElement) {
+                const performanceData = {{ widget_data.product_performance_chart|safe }};
+                console.log('Creating product chart with data:', performanceData);
+
                 new Chart(productChartElement, {
                     type: 'bar',
                     data: {
@@ -323,42 +361,47 @@
                             backgroundColor: 'rgba(78, 115, 223, 0.7)',
                             borderColor: 'rgba(78, 115, 223, 1)',
                             borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹' + context.parsed.y.toFixed(2);
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹' + context.parsed.y.toFixed(2);
+                                    }
                                 }
                             }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
                         },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+                console.log('Product chart created successfully');
             }
+        } catch (e) {
+            console.error('Error creating product chart:', e);
+            document.getElementById('productChartFallback').style.display = 'block';
         }
+        {% endif %}
     });
 </script>
 {% endblock %}

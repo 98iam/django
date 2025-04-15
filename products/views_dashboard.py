@@ -152,8 +152,17 @@ def reset_dashboard(request):
             'product_performance_chart': {'enabled': True, 'order': 9},
         }
 
+        # Force reset the dashboard widgets
+        preference.dashboard_widgets = {}
+        preference.save()
+
+        # Set the default widgets again
         preference.dashboard_widgets = default_widgets
         preference.save()
+
+        # Print the widgets to verify
+        print("Reset dashboard widgets to:", preference.dashboard_widgets)
+        print("Ordered widgets after reset:", [w[0] for w in preference.get_ordered_widgets()])
 
         messages.success(request, 'Dashboard settings have been reset to defaults with all chart widgets enabled.')
     except Exception as e:

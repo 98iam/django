@@ -4,8 +4,9 @@ from . import views_analytics
 from . import views_dashboard
 
 urlpatterns = [
-    # Test view
+    # Test views
     path('test/', views.test_view, name='test_view'),
+    path('test-chart/', views.test_chart, name='test_chart'),
 
     # Main views
     path('', views.dashboard, name='dashboard'),
