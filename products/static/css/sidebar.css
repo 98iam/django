@@ -11,7 +11,7 @@
     transition: left 0.3s ease;
     display: flex;
     flex-direction: column;
-    box-shadow: 2px 0 10px var(--shadow-color);
+    box-shadow: var(--card-shadow);
     padding-top: 56px; /* Height of navbar */
 }
 
@@ -20,11 +20,12 @@
 }
 
 .nav-sidebar-header {
-    padding: 15px;
+    padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .nav-sidebar-content {
@@ -40,45 +41,47 @@
 }
 
 .nav-sidebar-menu li {
-    border-bottom: 1px solid var(--border-color);
-}
-
-.nav-sidebar-menu li:last-child {
-    border-bottom: none;
+    margin: 5px 0;
 }
 
 .nav-sidebar-menu a {
     display: flex;
     align-items: center;
-    padding: 15px;
+    padding: 12px 20px;
     color: var(--text-color);
     text-decoration: none;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    border-radius: 0.375rem;
+    margin: 0.25rem 0.5rem;
 }
 
 .nav-sidebar-menu a:hover {
     background-color: var(--hover-bg);
+    transform: translateX(3px);
 }
 
 .nav-sidebar-menu a.active {
     background-color: var(--primary-color);
     color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .nav-sidebar-menu i {
     margin-right: 10px;
     width: 20px;
     text-align: center;
+    font-size: 1.1rem;
 }
 
 .nav-sidebar-submenu {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0.5rem;
     background-color: var(--hover-bg);
     overflow: hidden;
     max-height: 0;
     transition: max-height 0.3s ease;
+    border-radius: 0.375rem;
 }
 
 .nav-sidebar-submenu.open {
@@ -139,13 +142,14 @@
 .sidebar-toggle-btn {
     cursor: pointer;
     padding: 0.5rem;
-    border-radius: 4px;
+    border-radius: 0.375rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s;
+    transition: all 0.2s ease;
 }
 
 .sidebar-toggle-btn:hover {
-    background-color: var(--hover-bg);
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }

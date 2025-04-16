@@ -30,6 +30,7 @@
                         <th>Name</th>
                         <th>Description</th>
                         <th>Products Count</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,6 +39,11 @@
                         <td>{{ category.name }}</td>
                         <td>{{ category.description|default:'-' }}</td>
                         <td>{{ category.product_count }}</td>
+                        <td>
+                            <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

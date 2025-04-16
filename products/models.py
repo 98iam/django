@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
+import os
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -17,6 +18,10 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
         ordering = ['name']
+
+def product_image_path(instance, filename):
+    # File will be uploaded to MEDIA_ROOT/products/user_<id>/<filename>
+    return f'products/user_{instance.user.id}/{filename}'
 
 class Product(models.Model):
     STATUS_CHOICES = [
@@ -37,6 +42,7 @@ class Product(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     location = models.CharField(max_length=100, blank=True, null=True, help_text="Storage location")
     supplier = models.CharField(max_length=200, blank=True, null=True)
+    image = models.ImageField(upload_to=product_image_path, blank=True, null=True, help_text="Product image")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

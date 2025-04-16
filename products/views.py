@@ -280,7 +280,7 @@ def product_detail(request, pk):
 @login_required
 def product_create(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 product = form.save(commit=False)
@@ -307,7 +307,7 @@ def product_edit(request, pk):
     # Ensure the product belongs to the current user
     product = get_object_or_404(Product, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             messages.success(request, 'Product updated successfully.')
@@ -368,5 +368,36 @@ def category_create(request):
     return render(request, 'products/category_form.html', {
         'form': form,
         'title': 'Create Category'
+    })
+
+@login_required
+def category_delete(request, pk):
+    # Ensure the category belongs to the current user
+    category = get_object_or_404(Category, pk=pk, user=request.user)
+
+    # Check if the category has associated products
+    product_count = category.products.count()
+
+    if request.method == 'POST':
+        category_name = category.name
+
+        # Check if force delete is requested
+        force_delete = request.POST.get('force_delete') == 'yes'
+
+        if product_count > 0 and not force_delete:
+            messages.error(request, f'Cannot delete category "{category_name}" because it has {product_count} associated products. Please delete the products first or use force delete.')
+            return redirect('category_delete', pk=pk)
+
+        try:
+            category.delete()
+            messages.success(request, f'Category "{category_name}" deleted successfully.')
+            return redirect('category_list')
+        except Exception as e:
+            messages.error(request, f'Error deleting category: {str(e)}')
+            return redirect('category_list')
+
+    return render(request, 'products/category_confirm_delete.html', {
+        'category': category,
+        'product_count': product_count
     })
 # Create your views here.

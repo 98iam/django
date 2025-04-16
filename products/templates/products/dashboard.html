@@ -80,11 +80,24 @@
                         <div class="list-group">
                             {% for product in widget_data.recent_products %}
                             <a href="{% url 'product_detail' product.pk %}" class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{ product.name }}</h6>
-                                    <small>{{ product.created_at|date }}</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="text-center bg-light rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ product.name }}</h6>
+                                            <small>{{ product.created_at|date }}</small>
+                                        </div>
+                                        <p class="mb-1">Qty: {{ product.quantity }} | ₹{{ product.price|floatformat:2 }}</p>
+                                    </div>
                                 </div>
-                                <p class="mb-1">Qty: {{ product.quantity }} | ₹{{ product.price|floatformat:2 }}</p>
                             </a>
                             {% empty %}
                             <p class="text-muted">No products added yet.</p>

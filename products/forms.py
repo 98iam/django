@@ -6,7 +6,7 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = ['name', 'description', 'category', 'sku', 'barcode',
                  'price', 'cost', 'quantity', 'minimum_stock', 'maximum_stock',
-                 'status', 'location', 'supplier']
+                 'status', 'location', 'supplier', 'image']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
