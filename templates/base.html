@@ -394,6 +394,39 @@
                                         if (data.success) {
                                             loadChatSidebar(); // Go back to sessions list
                                         }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error deleting chat session:', error);
+                                        alert('Failed to delete chat session. Please try again.');
+                                    });
+                                }
+                            });
+                        }
+
+                        // Add event listener to delete all chats button
+                        const deleteAllBtn = document.querySelector('.delete-all-sessions-btn');
+                        if (deleteAllBtn) {
+                            deleteAllBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+
+                                if (confirm('Are you sure you want to delete ALL chat sessions? This cannot be undone.')) {
+                                    fetch('{% url "delete_all_sessions" %}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            loadChatSidebar(); // Go back to sessions list
+                                            alert(data.message || 'All chat sessions have been deleted.');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error deleting all chat sessions:', error);
+                                        alert('Failed to delete all chat sessions. Please try again.');
                                     });
                                 }
                             });

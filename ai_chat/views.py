@@ -166,3 +166,30 @@ def update_title(request, session_id):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@login_required
+@require_POST
+@csrf_exempt
+def delete_all_sessions(request):
+    """
+    Delete all chat sessions for the current user.
+    """
+    # Get all sessions for the current user
+    sessions = ChatSession.objects.filter(user=request.user)
+
+    # Count the number of sessions deleted
+    count = sessions.count()
+
+    # Delete all sessions
+    sessions.delete()
+
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'count': count,
+            'message': f'Successfully deleted {count} chat sessions.'
+        })
+
+    # Regular form submission
+    return redirect('chat_session')
