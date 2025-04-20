@@ -75,3 +75,4 @@ yarn-debug.log*
 .ipynb_checkpoints
 mcp_config.json
 mcpconfig.json
+landing_page.html

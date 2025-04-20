@@ -20,6 +20,7 @@ def test_view(request):
 
 # Landing page view
 def landing_page(request):
+    # Always show the landing page, even for authenticated users
     return render(request, 'landing_page.html')
 
 # Test view for Chart.js

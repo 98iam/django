@@ -133,6 +133,40 @@
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         /* Reuses existing .enhanced-card hover style */
+
+    /* Ensure responsiveness for the timeline */
+    @media (max-width: 767px) { /* Below Tailwind 'md' breakpoint */
+        .timeline-container {
+            padding-left: 0; padding-right: 0; /* Adjust padding as needed */
+        }
+        .left-timeline > div:nth-child(1), .right-timeline > div:nth-child(1) {
+            /* First child is the empty spacer div */
+            display: none; /* Hide spacer */
+        }
+        .left-timeline, .right-timeline {
+            justify-content: center; /* Center items */
+        }
+        .left-timeline > div:nth-child(3), .right-timeline > div:nth-child(3) {
+            /* Third child is the content card */
+            width: calc(100% - 4rem); /* Adjust width (full minus padding/margins) */
+            text-align: left; /* Ensure text alignment */
+        }
+         /* Make the timeline marker stick to the left */
+         .left-timeline > div:nth-child(2), .right-timeline > div:nth-child(2) {
+            /* Second child is the timeline circle */
+            position: absolute;
+             left: 0; /* Or adjust as needed e.g., left: 1rem */
+            margin-left: 0; /* Override default margin */
+             transform: translateX(-50%); /* Center icon on the left edge */
+         }
+         .relative.wrap > .border {
+             left: 1rem; /* Align line with icons on mobile */
+         }
+        .relative.wrap {
+             padding-left: 3rem; /* Give space for icons and line */
+            padding-right: 1rem;
+        }
+    }
     </style>
 
     <script>
@@ -329,6 +363,171 @@
         </div>
     </section>
 
+    <!-- Development Journey / Roadmap Section -->
+<section id="roadmap" class="py-20 bg-gradient-to-b from-white to-gray-100 dark:from-gray-800/90 dark:to-gray-900">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+            <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Our Development Journey</span>
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">From Idea to AI-Powered Reality</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Follow the key milestones that shaped InvManage Pro.</p>
+        </div>
+
+        <div class="relative wrap overflow-hidden p-10 h-full">
+            <!-- The Vertical Timeline Line -->
+            <div class="border-2-2 absolute border-opacity-20 border-gray-700 dark:border-gray-600 h-full border" style="left: 50%"></div>
+
+            <!-- == TIMELINE ITEMS == -->
+
+            <!-- Item 1: Foundation (Right Side) -->
+            <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-blue-500 dark:bg-blue-700 shadow-xl w-8 h-8 rounded-full">
+                    <h1 class="mx-auto font-semibold text-sm text-white">1</h1>
+                </div>
+                <div class="order-1 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-right" data-animation="slide-in-right">
+                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Early April 2025</span>
+                    <div class="flex items-center gap-3 mb-2">
+                       <i class="fas fa-drafting-compass text-blue-500 dark:text-blue-400 text-xl"></i>
+                       <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">Foundation & Setup</h4>
+                    </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Initial Django project structure, requirements, and basic setup established.</p>
+                </div>
+            </div>
+
+            <!-- Item 2: Authentication (Left Side) -->
+            <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-purple-500 dark:bg-purple-700 shadow-xl w-8 h-8 rounded-full">
+                    <h1 class="mx-auto text-white font-semibold text-sm">2</h1>
+                </div>
+                <div class="order-1 bg-white dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-left" data-animation="slide-in-left" style="transition-delay: 0.1s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">April 11th, 2025</span>
+                     <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-user-lock text-purple-500 dark:text-purple-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">User Authentication</h4>
+                    </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Implemented core user login and registration capabilities.</p>
+                </div>
+            </div>
+
+            <!-- Item 3: Core Dashboard & UX (Right Side) -->
+            <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                <div class="order-1 w-5/12"></div>
+                 <div class="z-10 flex items-center order-1 bg-green-500 dark:bg-green-700 shadow-xl w-8 h-8 rounded-full">
+                     <h1 class="mx-auto font-semibold text-sm text-white">3</h1>
+                </div>
+                <div class="order-1 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-right" data-animation="slide-in-right" style="transition-delay: 0.2s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">April 12th, 2025</span>
+                     <div class="flex items-center gap-3 mb-2">
+                         <i class="fas fa-tachometer-alt text-green-500 dark:text-green-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">Dashboard & Dark Mode</h4>
+                     </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Introduced the main dashboard with analytics potential and added dark mode support.</p>
+                </div>
+            </div>
+
+             <!-- Item 4: Advanced Dashboard Features (Left Side) -->
+             <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                 <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-yellow-500 dark:bg-yellow-700 shadow-xl w-8 h-8 rounded-full">
+                     <h1 class="mx-auto text-white font-semibold text-sm">4</h1>
+                </div>
+                <div class="order-1 bg-white dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-left" data-animation="slide-in-left" style="transition-delay: 0.3s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">April 12th, 2025</span>
+                    <div class="flex items-center gap-3 mb-2">
+                         <i class="fas fa-sliders-h text-yellow-500 dark:text-yellow-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">Customization & Export</h4>
+                    </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Added dashboard widget customization and data export functionality.</p>
+                </div>
+             </div>
+
+            <!-- Item 5: Settings Page (Right Side) -->
+             <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                <div class="order-1 w-5/12"></div>
+                 <div class="z-10 flex items-center order-1 bg-indigo-500 dark:bg-indigo-700 shadow-xl w-8 h-8 rounded-full">
+                    <h1 class="mx-auto font-semibold text-sm text-white">5</h1>
+                </div>
+                <div class="order-1 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-right" data-animation="slide-in-right" style="transition-delay: 0.4s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">April 12th, 2025</span>
+                     <div class="flex items-center gap-3 mb-2">
+                         <i class="fas fa-user-cog text-indigo-500 dark:text-indigo-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">User Settings Suite</h4>
+                    </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Launched profile, appearance, notification, and security settings page.</p>
+                </div>
+             </div>
+
+             <!-- Item 6: AI Integration (Left Side) -->
+             <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                 <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-red-500 dark:bg-red-700 shadow-xl w-8 h-8 rounded-full">
+                    <h1 class="mx-auto text-white font-semibold text-sm">6</h1>
+                </div>
+                <div class="order-1 bg-white dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-left" data-animation="slide-in-left" style="transition-delay: 0.5s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Mid April 2025</span>
+                     <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-robot text-red-500 dark:text-red-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">AI Chat Arrives (Gemini)</h4>
+                    </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Integrated Google Gemini for the initial AI chat assistant feature.</p>
+                 </div>
+            </div>
+
+            <!-- Item 7: AI Enhancement (Right Side) -->
+             <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-pink-500 dark:bg-pink-700 shadow-xl w-8 h-8 rounded-full">
+                    <h1 class="mx-auto font-semibold text-sm text-white">7</h1>
+                 </div>
+                 <div class="order-1 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-right" data-animation="slide-in-right" style="transition-delay: 0.6s;">
+                     <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Mid April 2025</span>
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-brain text-pink-500 dark:text-pink-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">Smarter & Contextual AI</h4>
+                     </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Enhanced AI with inventory context, user filtering, personalization (currency), and more detailed responses.</p>
+                </div>
+            </div>
+
+            <!-- Item 8: Product Details & UX (Left Side) -->
+            <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                 <div class="order-1 w-5/12"></div>
+                 <div class="z-10 flex items-center order-1 bg-teal-500 dark:bg-teal-700 shadow-xl w-8 h-8 rounded-full">
+                     <h1 class="mx-auto text-white font-semibold text-sm">8</h1>
+                </div>
+                <div class="order-1 bg-white dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-left" data-animation="slide-in-left" style="transition-delay: 0.7s;">
+                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Mid-Late April 2025</span>
+                     <div class="flex items-center gap-3 mb-2">
+                         <i class="fas fa-image text-teal-500 dark:text-teal-400 text-xl"></i>
+                        <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">Product Details & Nav</h4>
+                     </div>
+                    <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Added product image uploads, profile image display, dashboard graph integration, and a toggleable sidebar.</p>
+                </div>
+            </div>
+
+             <!-- Item 9: Enhanced Security (Right Side) -->
+            <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                <div class="order-1 w-5/12"></div>
+                <div class="z-10 flex items-center order-1 bg-cyan-500 dark:bg-cyan-700 shadow-xl w-8 h-8 rounded-full">
+                     <h1 class="mx-auto font-semibold text-sm text-white">9</h1>
+                </div>
+                 <div class="order-1 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-xl w-5/12 px-6 py-4 reveal slide-in-right" data-animation="slide-in-right" style="transition-delay: 0.8s;">
+                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block">Late April 2025</span>
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fas fa-shield-halved text-cyan-500 dark:text-cyan-400 text-xl"></i>
+                         <h4 class="font-semibold text-md text-gray-800 dark:text-gray-100">OTP Authentication</h4>
+                    </div>
+                     <p class="text-sm leading-snug tracking-wide text-gray-600 dark:text-gray-300">Implemented OTP-based authentication using Supabase for improved security.</p>
+                </div>
+             </div>
+             <!-- Add more items following the pattern -->
+
+        </div>
+    </div>
+</section>
+<!-- End Development Journey Section -->
+
      <!-- How It Works Section -->
      <section id="how-it-works" class="py-20 bg-white dark:bg-gray-800/90">
          <div class="container mx-auto px-6">
@@ -395,7 +594,7 @@
                         <li><span class="font-medium">Data Summaries:</span> "Give me a summary of my low-stock items."</li>
                         <li><span class="font-medium">User-Specific Context:</span> AI only accesses *your* data, ensuring privacy.</li>
                      </ul>
-                    <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <a href="{% url 'login' %}?next={% url 'chat_session' %}" class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                          Chat with AI Now <i class="fas fa-comments ml-2"></i>
                     </a>
                 </div>
@@ -426,7 +625,7 @@
                         <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Detailed, Savable Custom Reports</span></div>
                         <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Versatile Data Export Options (CSV, Excel, PDF)</span></div>
                      </div>
-                     <a href="#" class="inline-block bg-sky-600 hover:bg-sky-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                     <a href="{% url 'login' %}?next={% url 'sales_trends' %}" class="inline-block bg-sky-600 hover:bg-sky-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                          Explore Analytics <i class="fas fa-chart-bar ml-2"></i>
                      </a>
                  </div>
@@ -612,7 +811,7 @@
                  InvManage Pro is primarily web-based, accessible via any modern browser. Use these links for quick access or alternative options.
              </p>
              <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                 <a href="#" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transform hover:-translate-y-0.5">
+                 <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transform hover:-translate-y-0.5">
                     <i class="fas fa-desktop text-xl"></i>
                      <span>Open Web App</span>
                 </a>
