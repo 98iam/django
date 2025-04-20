@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Setup OTP Email Template{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Setup OTP Email Template in Supabase</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p><strong>Important:</strong> To use OTP codes instead of magic links, you need to modify your Supabase email template.</p>
+                    </div>
+                    
+                    <h5 class="mt-4">Follow these steps:</h5>
+                    <ol class="list-group list-group-numbered mb-4">
+                        <li class="list-group-item">Log in to your Supabase dashboard</li>
+                        <li class="list-group-item">Go to Authentication > Email Templates</li>
+                        <li class="list-group-item">Edit the "Magic Link" template</li>
+                        <li class="list-group-item">Replace the content with the template below</li>
+                        <li class="list-group-item">Save the changes</li>
+                    </ol>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Email Template for OTP</h5>
+                        </div>
+                        <div class="card-body">
+                            <pre class="bg-light p-3 rounded"><code>&lt;h2&gt;Your One-Time Password (OTP)&lt;/h2&gt;
+&lt;p&gt;Hello,&lt;/p&gt;
+&lt;p&gt;Your verification code is: &lt;strong&gt;{{ .Token }}&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This code will expire in 60 minutes.&lt;/p&gt;
+&lt;p&gt;If you didn't request this code, you can safely ignore this email.&lt;/p&gt;
+&lt;p&gt;Thanks,&lt;br&gt;The Team&lt;/p&gt;</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <p><strong>Note:</strong> The <code>{{ .Token }}</code> variable will be replaced with the actual OTP code when the email is sent.</p>
+                    </div>
+                    
+                    <h5 class="mt-4">Template Preview:</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2>Your One-Time Password (OTP)</h2>
+                            <p>Hello,</p>
+                            <p>Your verification code is: <strong>123456</strong></p>
+                            <p>This code will expire in 60 minutes.</p>
+                            <p>If you didn't request this code, you can safely ignore this email.</p>
+                            <p>Thanks,<br>The Team</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'login' %}" class="btn btn-primary">Back to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

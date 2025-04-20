@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Login</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="login-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3" id="password-field">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <input type="hidden" name="login_with_otp" id="login_with_otp" value="false">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="login-btn">Login</button>
+                            <button type="button" class="btn btn-outline-primary" id="otp-login-btn">Login with OTP</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 text-center">
+                        <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+                        <p class="mt-2"><a href="{% url 'setup_otp' %}" class="text-info">Having trouble with OTP? Click here for setup instructions</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('login-form');
+        const passwordField = document.getElementById('password-field');
+        const passwordInput = document.getElementById('password');
+        const loginWithOtpInput = document.getElementById('login_with_otp');
+        const loginBtn = document.getElementById('login-btn');
+        const otpLoginBtn = document.getElementById('otp-login-btn');
+
+        // Handle OTP login button click
+        otpLoginBtn.addEventListener('click', function() {
+            // Hide password field and make it not required
+            passwordField.style.display = 'none';
+            passwordInput.required = false;
+
+            // Set the hidden input to indicate OTP login
+            loginWithOtpInput.value = 'true';
+
+            // Change the main button text
+            loginBtn.textContent = 'Send OTP';
+
+            // Hide the OTP button itself
+            otpLoginBtn.style.display = 'none';
+
+            // Submit the form
+            loginForm.submit();
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
