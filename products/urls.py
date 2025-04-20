@@ -9,7 +9,8 @@ urlpatterns = [
     path('test-chart/', views.test_chart, name='test_chart'),
 
     # Main views
-    path('', views.dashboard, name='dashboard'),
+    path('', views.landing_page, name='landing_page'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('products/', views.product_list, name='product_list'),
     path('products/create/', views.product_create, name='product_create'),
     path('products/<int:pk>/', views.product_detail, name='product_detail'),

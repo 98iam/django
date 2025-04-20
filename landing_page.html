@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvManage Pro - Next-Gen AI Inventory Management</title>
+    <meta name="description" content="Transform your inventory management with InvManage Pro. Powerful features, real-time tracking, advanced analytics, and a smart AI assistant powered by Google Gemini.">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom Styles -->
+    <style>
+        /* --- Animation Classes --- */
+        .reveal { opacity: 0; transition: opacity 1s ease-out, transform 1s ease-out; }
+        .reveal.fade-in { transform: translateY(30px); }
+        .reveal.slide-in-left { transform: translateX(-50px); }
+        .reveal.slide-in-right { transform: translateX(50px); }
+        .reveal.zoom-in { transform: scale(0.9); }
+
+        .reveal.visible { opacity: 1; transform: none; } /* Target state */
+
+        /* --- Body Background --- */
+        body {
+            --gradient-start-light: #f7fafc;
+            --gradient-end-light: #edf2f7;
+            --gradient-start-dark: #1a202c;
+            --gradient-end-dark: #2d3748;
+        }
+        html:not(.dark) body { background: linear-gradient(135deg, var(--gradient-start-light), var(--gradient-end-light)); }
+        html.dark body { background: linear-gradient(135deg, var(--gradient-start-dark), var(--gradient-end-dark)); }
+
+        /* --- Navbar Styling --- */
+        #navbar { transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        #navbar.scrolled {
+            background-color: rgba(255, 255, 255, 0.85); /* Light mode */
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        html.dark #navbar.scrolled {
+            background-color: rgba(26, 32, 44, 0.85); /* Dark mode */
+             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Hamburger Animation --- */
+        .hamburger div { transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); }
+        .hamburger.active div:first-child { transform: translateY(8px) rotate(45deg); }
+        .hamburger.active div:nth-child(2) { transform: scaleX(0); }
+        .hamburger.active div:last-child { transform: translateY(-8px) rotate(-45deg); }
+
+        /* --- Enhanced Card Hover --- */
+        .enhanced-card { transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .enhanced-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15);
+        }
+        html.dark .enhanced-card:hover { box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.4); }
+         .enhanced-card:hover .card-icon { transform: rotate(-10deg) scale(1.1); }
+        .card-icon { transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: inline-block; }
+
+        /* --- Gradient Text --- */
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6); /* Blue to Purple */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        html.dark .gradient-text {
+             background: linear-gradient(90deg, #60a5fa, #a78bfa); /* Lighter gradient for dark mode */
+             -webkit-background-clip: text;
+             background-clip: text;
+             color: transparent;
+        }
+
+        /* --- Chart Placeholder --- */
+        .chart-placeholder {
+            aspect-ratio: 16 / 10; width: 100%;
+            background-color: #e2e8f0; border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center;
+            font-style: italic; color: #64748b; border: 1px dashed #cbd5e1;
+        }
+        html.dark .chart-placeholder {
+            background-color: #374151; color: #9ca3af; border: 1px dashed #4b5563;
+        }
+
+        /* --- Testimonial Quote --- */
+        .testimonial-quote::before {
+            content: '\f10d'; /* Font Awesome quote-left */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: #cbd5e1; /* Light mode quote color */
+            position: absolute;
+            top: -0.5rem;
+            left: -1rem;
+            opacity: 0.8;
+        }
+        html.dark .testimonial-quote::before { color: #4a5568; /* Dark mode quote color */ }
+
+        /* --- FAQ Accordion Marker --- */
+        details summary::-webkit-details-marker { display:none; } /* Hide default marker */
+        details summary { list-style: none; } /* Hide default marker in Firefox */
+        details summary::after {
+            content: '\f078'; /* Font Awesome chevron-down */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            float: right;
+            transition: transform 0.3s ease;
+            margin-left: 0.5rem;
+            font-size: 0.8em;
+            margin-top: 0.25rem;
+        }
+        details[open] summary::after { transform: rotate(180deg); }
+
+        /* --- Subtle Background Patterns (Optional) --- */
+        .pattern-bg {
+            background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        html.dark .pattern-bg {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+        }
+
+        /* Base HTML smooth scroll */
+        html { color-scheme: light dark; scroll-behavior: smooth; }
+        html.dark { color-scheme: dark; }
+
+        /* Team Member Card Styles from Readme */
+        .team-member-card {
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        /* Reuses existing .enhanced-card hover style */
+    </style>
+
+    <script>
+        // Initial Dark Mode check (prevents FOUC)
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans antialiased text-base leading-relaxed">
+
+    <!-- Navigation Bar -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 py-3 px-4 md:px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center space-x-2 group">
+                 <i class="fas fa-boxes-stacked transition-transform duration-300 group-hover:rotate-[-5deg]"></i>
+                 <span>InvManage Pro</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-5 lg:space-x-7">
+                <a href="#features" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">Features</a>
+                <a href="#how-it-works" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">How it Works</a>
+                <a href="#ai-assistant" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">AI Assistant</a>
+                <a href="#analytics" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">Analytics</a>
+                <a href="#testimonials" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">Testimonials</a>
+                <a href="#faq" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">FAQ</a>
+                <a href="#download" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition duration-200 text-sm font-medium">Download</a>
+
+                <button id="darkModeToggle" title="Toggle Dark Mode" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition duration-300 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-800">
+                    <i class="fas fa-moon text-lg hidden dark:inline"></i>
+                    <i class="fas fa-sun text-lg inline dark:hidden"></i>
+                </button>
+                <a href="{% url 'login' %}" class="text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md text-sm font-medium transition duration-300 shadow-sm hover:shadow">Log In</a>
+                <a href="{% url 'register' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">Sign Up</a>
+            </div>
+            <!-- Mobile Menu Trigger -->
+            <div class="md:hidden flex items-center space-x-3">
+                <button id="darkModeToggleMobile" title="Toggle Dark Mode" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-2 rounded-full focus:outline-none">
+                     <i class="fas fa-moon text-lg hidden dark:inline"></i>
+                     <i class="fas fa-sun text-lg inline dark:hidden"></i>
+                </button>
+                 <button id="mobileMenuButton" class="hamburger focus:outline-none p-2" aria-label="Toggle Menu" aria-expanded="false">
+                    <div class="w-6 h-0.5 bg-gray-800 dark:bg-gray-200 my-1"></div>
+                    <div class="w-6 h-0.5 bg-gray-800 dark:bg-gray-200 my-1"></div>
+                    <div class="w-6 h-0.5 bg-gray-800 dark:bg-gray-200 my-1"></div>
+                 </button>
+             </div>
+         </div>
+        <!-- Mobile Menu Panel -->
+         <div id="mobileMenu" class="md:hidden hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-800 shadow-xl py-4 z-40 max-h-screen overflow-y-auto">
+            <div class="container mx-auto px-6 flex flex-col space-y-3">
+                <a href="#features" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">Features</a>
+                <a href="#how-it-works" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">How it Works</a>
+                <a href="#ai-assistant" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">AI Assistant</a>
+                <a href="#analytics" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">Analytics</a>
+                <a href="#testimonials" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">Testimonials</a>
+                <a href="#faq" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">FAQ</a>
+                 <a href="#download" class="mobile-menu-link block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2 text-center border-b border-gray-200 dark:border-gray-700">Download</a>
+                 <div class="flex justify-center space-x-4 pt-4">
+                    <a href="{% url 'login' %}" class="w-1/2 text-center text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-md text-sm font-medium transition duration-300">Log In</a>
+                    <a href="{% url 'register' %}" class="w-1/2 text-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 shadow-md">Sign Up</a>
+                 </div>
+             </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-32 pb-20 md:pt-48 md:pb-32 flex items-center min-h-[90vh] relative overflow-hidden">
+        <!-- Subtle background shapes (optional) -->
+        <div class="absolute top-0 left-0 w-full h-full pattern-bg opacity-50 dark:opacity-30"></div>
+        <div class="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-blue-200/30 dark:bg-blue-900/30 rounded-full filter blur-3xl opacity-50 animate-pulse"></div>
+        <div class="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-purple-200/30 dark:bg-purple-900/30 rounded-full filter blur-3xl opacity-50 animation-delay-4000 animate-pulse"></div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-5 leading-tight text-gray-900 dark:text-white reveal fade-in" data-animation="fade-in">
+                Inventory Management, <br class="hidden md:block" /> Reimagined with <span class="gradient-text">AI Power</span>.
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-10 reveal fade-in" data-animation="fade-in" style="transition-delay: 0.2s;">
+                Effortlessly track products, manage stock, gain insights with advanced analytics, and interact with your data using our intelligent Gemini AI assistant.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-5 reveal fade-in" data-animation="fade-in" style="transition-delay: 0.4s;">
+                <a href="{% url 'register' %}" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2">
+                    <i class="fas fa-rocket"></i>
+                    <span>Start Free Trial</span>
+                </a>
+                <a href="#features" class="w-full sm:w-auto bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 px-8 py-3 rounded-lg text-lg font-semibold transition duration-300 ease-in-out shadow-sm hover:shadow-md transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <i class="fas fa-book-open"></i>
+                    <span>Explore Features</span>
+                </a>
+            </div>
+            <div class="mt-16 md:mt-24 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.6s;">
+                 <img src="https://placehold.co/900x500/e0f2fe/0ea5e9?text=Dynamic+Dashboard+View" alt="InvManage Pro Dashboard Preview" class="mx-auto rounded-xl shadow-2xl max-w-4xl w-full border-4 border-white dark:border-gray-700">
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Counter Section -->
+     <section id="stats" class="py-16 bg-white dark:bg-gray-800">
+         <div class="container mx-auto px-6">
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                 <div class="reveal fade-in" data-animation="fade-in">
+                     <div class="text-4xl font-bold gradient-text mb-2">
+                         <span class="counter" data-target="10000" data-duration="2000">0</span>+
+                     </div>
+                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Products Managed</p>
+                 </div>
+                 <div class="reveal fade-in" data-animation="fade-in" style="transition-delay: 0.1s;">
+                    <div class="text-4xl font-bold gradient-text mb-2">
+                        <span class="counter" data-target="500" data-duration="2000">0</span>+
+                    </div>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Users</p>
+                </div>
+                 <div class="reveal fade-in" data-animation="fade-in" style="transition-delay: 0.2s;">
+                    <div class="text-4xl font-bold gradient-text mb-2">
+                       <span class="counter" data-target="99" data-duration="2500">0</span>%
+                     </div>
+                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Uptime Guarantee</p>
+                 </div>
+                  <div class="reveal fade-in" data-animation="fade-in" style="transition-delay: 0.3s;">
+                    <div class="text-4xl font-bold gradient-text mb-2">
+                        <span class="counter" data-target="24" data-duration="1500">0</span>/<span class="counter" data-target="7" data-duration="1000">0</span>
+                     </div>
+                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Support Available</p>
+                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800/90 pattern-bg">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+                <span class="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest">Core Capabilities</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">Everything You Need, Intelligently Connected</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Discover the features designed to optimize your inventory workflow.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature Card 1 -->
+                <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in">
+                     <div class="text-blue-500 dark:text-blue-400 mb-4 text-4xl">
+                        <i class="fas fa-boxes-stacked card-icon"></i>
+                     </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Comprehensive Product Mgmt</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Detailed product info, variants, categorization, easy CRUD operations, and image support.</p>
+                </div>
+
+                <!-- Feature Card 2 -->
+                 <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.1s;">
+                     <div class="text-green-500 dark:text-green-400 mb-4 text-4xl">
+                         <i class="fas fa-chart-line card-icon"></i>
+                     </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Real-time Stock Tracking</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Instant updates, low stock alerts, status indicators (in-stock, low, out), stock history.</p>
+                </div>
+
+                <!-- Feature Card 3 -->
+                <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.2s;">
+                    <div class="text-purple-500 dark:text-purple-400 mb-4 text-4xl">
+                         <i class="fas fa-robot card-icon"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Gemini AI Assistant</h3>
+                     <p class="text-gray-600 dark:text-gray-400 text-sm">Context-aware chat, query your data, get usage help, summarize inventory, personalized insights.</p>
+                 </div>
+
+                 <!-- Feature Card 4 -->
+                <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.3s;">
+                     <div class="text-yellow-500 dark:text-yellow-400 mb-4 text-4xl">
+                         <i class="fas fa-chart-pie card-icon"></i>
+                     </div>
+                     <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Advanced Analytics Suite</h3>
+                     <p class="text-gray-600 dark:text-gray-400 text-sm">Interactive charts (sales, value, performance), customizable dashboard, period comparisons.</p>
+                </div>
+
+                 <!-- Feature Card 5 -->
+                <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.4s;">
+                    <div class="text-red-500 dark:text-red-400 mb-4 text-4xl">
+                         <i class="fas fa-file-export card-icon"></i>
+                     </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Reporting & Export</h3>
+                     <p class="text-gray-600 dark:text-gray-400 text-sm">Generate custom reports, save templates, export data to CSV, Excel, PDF formats.</p>
+                </div>
+
+                <!-- Feature Card 6 -->
+                <div class="enhanced-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 reveal zoom-in" data-animation="zoom-in" style="transition-delay: 0.5s;">
+                    <div class="text-indigo-500 dark:text-indigo-400 mb-4 text-4xl">
+                         <i class="fas fa-paint-brush card-icon"></i>
+                    </div>
+                     <h3 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Superior UX & Customization</h3>
+                     <p class="text-gray-600 dark:text-gray-400 text-sm">Dark/light mode, responsive design, user isolation, dashboard widgets, profile settings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- How It Works Section -->
+     <section id="how-it-works" class="py-20 bg-white dark:bg-gray-800/90">
+         <div class="container mx-auto px-6">
+              <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+                <span class="text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-widest">Get Started Easily</span>
+                 <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">Effortless Inventory Control in 3 Steps</h2>
+             </div>
+            <div class="relative">
+                 <!-- Connecting line (optional, adds complexity) -->
+                <div class="hidden md:block absolute left-1/2 top-10 bottom-10 w-px bg-gray-300 dark:bg-gray-600 transform -translate-x-1/2"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 relative z-10">
+                    <!-- Step 1 -->
+                    <div class="text-center reveal fade-in" data-animation="fade-in">
+                         <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 text-2xl font-bold ring-4 ring-green-200 dark:ring-green-700">1</div>
+                        <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md">
+                             <i class="fas fa-cloud-upload-alt text-3xl text-green-500 mb-3"></i>
+                            <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Set Up & Add Products</h3>
+                             <p class="text-sm text-gray-600 dark:text-gray-400">Sign up, configure your settings, and easily add your products and categories.</p>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="text-center reveal fade-in" data-animation="fade-in" style="transition-delay: 0.2s;">
+                         <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 text-2xl font-bold ring-4 ring-green-200 dark:ring-green-700">2</div>
+                         <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md">
+                            <i class="fas fa-search-dollar text-3xl text-green-500 mb-3"></i>
+                            <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Track & Monitor</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">View real-time stock levels, track movements, and set up low-stock notifications.</p>
+                        </div>
+                    </div>
+                     <!-- Step 3 -->
+                     <div class="text-center reveal fade-in" data-animation="fade-in" style="transition-delay: 0.4s;">
+                         <div class="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 text-2xl font-bold ring-4 ring-green-200 dark:ring-green-700">3</div>
+                         <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-md">
+                             <i class="fas fa-brain text-3xl text-green-500 mb-3"></i>
+                             <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Analyze & Optimize</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Use the dashboard analytics and AI assistant to gain insights and make better decisions.</p>
+                        </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </section>
+
+    <!-- AI Assistant Section (Alternating Layout) -->
+     <section id="ai-assistant" class="py-20 bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-indigo-900 dark:to-gray-900 overflow-hidden">
+         <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+                <!-- Image First -->
+                 <div class="md:w-1/2 reveal slide-in-left" data-animation="slide-in-left">
+                     <img src="https://placehold.co/600x500/a5b4fc/4338ca?text=Interactive+AI+Chat+Mockup" alt="AI Chat Assistant Interface" class="rounded-lg shadow-xl w-full transform transition duration-500 hover:scale-105">
+                 </div>
+                <!-- Text Second -->
+                 <div class="md:w-1/2 text-center md:text-left reveal slide-in-right" data-animation="slide-in-right">
+                    <span class="text-sm font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-widest">Intelligent Assistance</span>
+                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold my-4 text-gray-900 dark:text-white">Talk to Your Inventory Data</h2>
+                     <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                         Leverage the power of Google Gemini. Ask natural language questions about your stock, sales, or system features. Get instant, accurate answers tailored to your user data.
+                     </p>
+                     <ul class="space-y-3 text-gray-700 dark:text-gray-300 text-left mb-8 marker:text-purple-500 list-disc list-inside">
+                         <li><span class="font-medium">Query Inventory:</span> "How many units of 'Product X' are left?"</li>
+                        <li><span class="font-medium">Sales Insights:</span> "What were my top 5 best-selling items last month?"</li>
+                         <li><span class="font-medium">System Help:</span> "How do I export a report to PDF?"</li>
+                        <li><span class="font-medium">Data Summaries:</span> "Give me a summary of my low-stock items."</li>
+                        <li><span class="font-medium">User-Specific Context:</span> AI only accesses *your* data, ensuring privacy.</li>
+                     </ul>
+                    <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                         Chat with AI Now <i class="fas fa-comments ml-2"></i>
+                    </a>
+                </div>
+            </div>
+         </div>
+    </section>
+
+     <!-- Analytics Section (Alternating Layout) -->
+     <section id="analytics" class="py-20 bg-white dark:bg-gray-800/80 pattern-bg">
+         <div class="container mx-auto px-6">
+             <div class="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
+                 <!-- Image Second -->
+                 <div class="md:w-1/2 reveal slide-in-right" data-animation="slide-in-right">
+                      <img src="https://placehold.co/600x500/bae6fd/0c4a6e?text=Detailed+Analytics+Charts" alt="Analytics Dashboard Charts" class="rounded-lg shadow-xl w-full transform transition duration-500 hover:scale-105">
+                 </div>
+                <!-- Text First -->
+                <div class="md:w-1/2 text-center md:text-left reveal slide-in-left" data-animation="slide-in-left">
+                     <span class="text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-widest">Data-Driven Insights</span>
+                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold my-4 text-gray-900 dark:text-white">Visualize Your Performance</h2>
+                     <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                         Make informed decisions with a comprehensive suite of analytics tools. Track key metrics, spot trends, and understand your inventory health at a glance.
+                    </p>
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-gray-700 dark:text-gray-300 mb-8 text-sm">
+                        <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Interactive Sales Trend Charts (Daily/Weekly/Monthly)</span></div>
+                         <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Real-time Inventory Value Tracking</span></div>
+                         <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Best/Worst Product Performance Metrics</span></div>
+                        <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Customizable Dashboard Widgets</span></div>
+                        <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Detailed, Savable Custom Reports</span></div>
+                        <div class="flex items-start"><i class="fas fa-check-circle text-sky-500 mr-2 mt-1 flex-shrink-0"></i><span>Versatile Data Export Options (CSV, Excel, PDF)</span></div>
+                     </div>
+                     <a href="#" class="inline-block bg-sky-600 hover:bg-sky-700 text-white px-7 py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                         Explore Analytics <i class="fas fa-chart-bar ml-2"></i>
+                     </a>
+                 </div>
+             </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-6">
+             <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+                <span class="text-sm font-semibold text-yellow-600 dark:text-yellow-400 uppercase tracking-widest">Don't Just Take Our Word</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">Hear From Our Happy Users</h2>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative reveal fade-in" data-animation="fade-in">
+                    <p class="text-gray-600 dark:text-gray-400 italic mb-6 testimonial-quote">"InvManage Pro revolutionized how we track stock. The AI assistant is surprisingly helpful for quick queries. Saves us hours each week!"</p>
+                     <div class="flex items-center">
+                         <img src="https://placehold.co/40x40/a7f3d0/059669?text=A" alt="User Avatar" class="w-10 h-10 rounded-full mr-3 border-2 border-green-300 dark:border-green-600">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-100">Alice B.</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Small Business Owner</p>
+                         </div>
+                     </div>
+                 </div>
+                <!-- Testimonial 2 -->
+                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative reveal fade-in" data-animation="fade-in" style="transition-delay: 0.15s;">
+                     <p class="text-gray-600 dark:text-gray-400 italic mb-6 testimonial-quote">"The analytics dashboard is fantastic. Finally, clear visibility into our inventory value and bestsellers. The dark mode is a nice touch too."</p>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/bfdbfe/1e40af?text=M" alt="User Avatar" class="w-10 h-10 rounded-full mr-3 border-2 border-blue-300 dark:border-blue-600">
+                         <div>
+                             <p class="font-semibold text-gray-800 dark:text-gray-100">Mark R.</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Warehouse Manager</p>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Testimonial 3 -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg relative reveal fade-in" data-animation="fade-in" style="transition-delay: 0.3s;">
+                    <p class="text-gray-600 dark:text-gray-400 italic mb-6 testimonial-quote">"As a Django developer myself, I appreciate the solid tech stack. Supabase integration is smooth. Easy to set up and get started."</p>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/fecaca/991b1b?text=C" alt="User Avatar" class="w-10 h-10 rounded-full mr-3 border-2 border-red-300 dark:border-red-600">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-100">Chris P.</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">E-commerce Developer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-white dark:bg-gray-800/80">
+        <div class="container mx-auto px-6 max-w-4xl">
+             <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+                <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Got Questions?</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">Frequently Asked Questions</h2>
+            </div>
+             <div class="space-y-5">
+                <!-- FAQ Item 1 -->
+                 <details class="group bg-gray-50 dark:bg-gray-700/50 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 reveal fade-in" data-animation="fade-in">
+                     <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-gray-900 dark:text-gray-100">
+                        <span>Is InvManage Pro free to use?</span>
+                         <!-- Icon handled by CSS ::after -->
+                     </summary>
+                     <div class="text-gray-600 dark:text-gray-400 mt-3 text-sm group-open:animate-fadeIn">
+                        Currently, InvManage Pro offers a generous free tier perfect for small businesses and individuals. We may introduce optional paid plans with advanced features in the future. For now, enjoy the core functionality for free!
+                    </div>
+                </details>
+                 <!-- FAQ Item 2 -->
+                 <details class="group bg-gray-50 dark:bg-gray-700/50 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 reveal fade-in" data-animation="fade-in" style="transition-delay: 0.1s;">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-gray-900 dark:text-gray-100">
+                        <span>What do I need to run this system?</span>
+                     </summary>
+                     <div class="text-gray-600 dark:text-gray-400 mt-3 text-sm group-open:animate-fadeIn">
+                        You'll need Python (3.8+), PostgreSQL (or configure SQLite for development), and Git. An optional Google Gemini API Key is required for the AI Chat Assistant. Detailed setup instructions are in the README on GitHub.
+                    </div>
+                 </details>
+                 <!-- FAQ Item 3 -->
+                 <details class="group bg-gray-50 dark:bg-gray-700/50 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 reveal fade-in" data-animation="fade-in" style="transition-delay: 0.2s;">
+                     <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-gray-900 dark:text-gray-100">
+                         <span>Is my data secure?</span>
+                     </summary>
+                    <div class="text-gray-600 dark:text-gray-400 mt-3 text-sm group-open:animate-fadeIn">
+                         Yes. We utilize Django's robust security features. If using Supabase, you benefit from their enterprise-grade security. Multi-user support includes data isolation, meaning users can only access their own inventory data. The AI assistant also respects this data isolation.
+                    </div>
+                 </details>
+                 <!-- FAQ Item 4 -->
+                 <details class="group bg-gray-50 dark:bg-gray-700/50 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 reveal fade-in" data-animation="fade-in" style="transition-delay: 0.3s;">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none text-gray-900 dark:text-gray-100">
+                         <span>Can I contribute to the project?</span>
+                     </summary>
+                     <div class="text-gray-600 dark:text-gray-400 mt-3 text-sm group-open:animate-fadeIn">
+                        Absolutely! Pull requests are welcome. Please check the `CONTRIBUTING.md` file (if available) or open an issue on GitHub first to discuss major changes. We appreciate community involvement.
+                     </div>
+                </details>
+             </div>
+         </div>
+     </section>
+
+    <!-- Meet the Team Section -->
+    <section id="team" class="py-20 bg-gray-100 dark:bg-gray-800/50 pattern-bg">
+        <div class="container mx-auto px-6">
+             <div class="text-center mb-16 reveal fade-in" data-animation="fade-in">
+                <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">The People Behind the Pixels</span>
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4 text-gray-900 dark:text-white">Meet the Creators</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">A dedicated team of 4 frontend enthusiasts and 1 backend architect brought InvManage Pro to life.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6 justify-center">
+
+                <!-- Team Member 1 (Frontend) -->
+                <div class="team-member-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center border border-gray-200 dark:border-gray-700 reveal zoom-in enhanced-card" data-animation="zoom-in">
+                    <img src="https://placehold.co/120x120/cbd5e1/475569?text=Dev1" alt="Team Member 1 Portrait" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-300 dark:border-blue-600 object-cover">
+                    <h4 class="text-lg font-semibold mb-1 text-gray-900 dark:text-white">Dev Name One</h4>
+                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-3">Frontend Developer</p>
+                    <div class="flex justify-center space-x-3 text-gray-500 dark:text-gray-400">
+                        <a href="#" title="GitHub" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-github"></i></a>
+                        <a href="#" title="LinkedIn" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Twitter" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 (Frontend) -->
+                 <div class="team-member-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center border border-gray-200 dark:border-gray-700 reveal zoom-in enhanced-card" data-animation="zoom-in" style="transition-delay: 0.1s;">
+                    <img src="https://placehold.co/120x120/bfdbfe/1e40af?text=Dev2" alt="Team Member 2 Portrait" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-300 dark:border-blue-600 object-cover">
+                    <h4 class="text-lg font-semibold mb-1 text-gray-900 dark:text-white">Dev Name Two</h4>
+                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-3">Frontend Developer</p>
+                     <div class="flex justify-center space-x-3 text-gray-500 dark:text-gray-400">
+                        <a href="#" title="GitHub" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-github"></i></a>
+                         <a href="#" title="LinkedIn" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-linkedin-in"></i></a>
+                         <a href="#" title="Twitter" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-twitter"></i></a>
+                     </div>
+                 </div>
+
+                 <!-- Team Member 3 (Frontend) -->
+                 <div class="team-member-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center border border-gray-200 dark:border-gray-700 reveal zoom-in enhanced-card" data-animation="zoom-in" style="transition-delay: 0.2s;">
+                    <img src="https://placehold.co/120x120/a5b4fc/4338ca?text=Dev3" alt="Team Member 3 Portrait" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-300 dark:border-blue-600 object-cover">
+                     <h4 class="text-lg font-semibold mb-1 text-gray-900 dark:text-white">Dev Name Three</h4>
+                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-3">Frontend Developer</p>
+                     <div class="flex justify-center space-x-3 text-gray-500 dark:text-gray-400">
+                        <a href="#" title="GitHub" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-github"></i></a>
+                         <a href="#" title="LinkedIn" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-linkedin-in"></i></a>
+                         <a href="#" title="Twitter" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <!-- Team Member 4 (Frontend) -->
+                 <div class="team-member-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center border border-gray-200 dark:border-gray-700 reveal zoom-in enhanced-card" data-animation="zoom-in" style="transition-delay: 0.3s;">
+                     <img src="https://placehold.co/120x120/99f6e4/0f766e?text=Dev4" alt="Team Member 4 Portrait" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-blue-300 dark:border-blue-600 object-cover">
+                     <h4 class="text-lg font-semibold mb-1 text-gray-900 dark:text-white">Dev Name Four</h4>
+                     <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-3">Frontend Developer</p>
+                     <div class="flex justify-center space-x-3 text-gray-500 dark:text-gray-400">
+                         <a href="#" title="GitHub" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-github"></i></a>
+                         <a href="#" title="LinkedIn" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-linkedin-in"></i></a>
+                         <a href="#" title="Twitter" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-twitter"></i></a>
+                    </div>
+                 </div>
+
+                <!-- Team Member 5 (Backend) -->
+                <div class="team-member-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center border border-gray-200 dark:border-gray-700 reveal zoom-in enhanced-card" data-animation="zoom-in" style="transition-delay: 0.4s;">
+                    <img src="https://placehold.co/120x120/fbcfe8/831843?text=Dev5" alt="Team Member 5 Portrait" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-purple-300 dark:border-purple-600 object-cover">
+                    <h4 class="text-lg font-semibold mb-1 text-gray-900 dark:text-white">Dev Name Five</h4>
+                    <p class="text-sm font-medium text-purple-600 dark:text-purple-400 mb-3">Backend Developer</p>
+                    <div class="flex justify-center space-x-3 text-gray-500 dark:text-gray-400">
+                        <a href="#" title="GitHub" class="hover:text-purple-500 dark:hover:text-purple-400 transition duration-200"><i class="fab fa-github"></i></a>
+                        <a href="#" title="LinkedIn" class="hover:text-purple-500 dark:hover:text-purple-400 transition duration-200"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Twitter" class="hover:text-purple-500 dark:hover:text-purple-400 transition duration-200"><i class="fab fa-twitter"></i></a>
+                    </div>
+                 </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- End Meet the Team Section -->
+
+     <!-- Download Section -->
+    <section id="download" class="py-20 bg-gradient-to-b from-gray-50 to-blue-100 dark:from-gray-900 dark:to-slate-900/90">
+         <div class="container mx-auto px-6 text-center reveal fade-in" data-animation="fade-in">
+             <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Access Anywhere, Anytime</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
+                 InvManage Pro is primarily web-based, accessible via any modern browser. Use these links for quick access or alternative options.
+             </p>
+             <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                 <a href="#" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transform hover:-translate-y-0.5">
+                    <i class="fas fa-desktop text-xl"></i>
+                     <span>Open Web App</span>
+                </a>
+                 <a href="#" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transform hover:-translate-y-0.5">
+                     <i class="fab fa-android text-xl"></i>
+                     <span>Download APK (Demo)</span> <!-- Keep as Placeholder -->
+                </a>
+                 <a href="#" class="w-full sm:w-auto bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2 transform hover:-translate-y-0.5">
+                    <i class="fab fa-github text-xl"></i>
+                    <span>View on GitHub</span>
+                 </a>
+            </div>
+             <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">(Note: APK download is a demonstration placeholder.)</p>
+        </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section id="cta" class="py-24 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 text-white relative overflow-hidden">
+         <!-- Decorative elements -->
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full filter blur-xl"></div>
+         <div class="absolute -bottom-16 -right-5 w-48 h-48 bg-white/10 rounded-full filter blur-2xl"></div>
+
+        <div class="container mx-auto px-6 text-center relative z-10 reveal zoom-in" data-animation="zoom-in">
+            <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6">Ready to Transform Your Inventory Workflow?</h2>
+            <p class="text-lg md:text-xl text-blue-100 dark:text-blue-200 max-w-xl mx-auto mb-10">
+                Join hundreds of businesses streamlining their operations with InvManage Pro. Sign up for your free account today!
+             </p>
+            <a href="{% url 'register' %}" class="bg-white hover:bg-gray-100 text-blue-700 px-10 py-4 rounded-lg text-lg font-bold transition duration-300 ease-in-out shadow-xl hover:shadow-2xl transform hover:scale-105 inline-block">
+                Get Started Now - It's Free!
+            </a>
+        </div>
+    </section>
+
+     <!-- Footer -->
+     <footer class="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 py-16">
+         <div class="container mx-auto px-6">
+             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-10">
+                 <!-- Column 1: Brand & Social -->
+                <div class="col-span-2 lg:col-span-1">
+                    <a href="#" class="text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center space-x-2 mb-4 group">
+                         <i class="fas fa-boxes-stacked transition-transform duration-300 group-hover:rotate-[-5deg]"></i>
+                        <span>InvManage Pro</span>
+                    </a>
+                    <p class="text-sm mb-5">Intelligent inventory management powered by Django and AI.</p>
+                     <div class="flex space-x-4">
+                        <a href="#" aria-label="GitHub Repository" title="GitHub" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-github text-lg"></i></a>
+                        <a href="#" aria-label="Twitter Profile" title="Twitter" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-twitter text-lg"></i></a>
+                         <a href="#" aria-label="LinkedIn Profile" title="LinkedIn" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200"><i class="fab fa-linkedin-in text-lg"></i></a>
+                     </div>
+                 </div>
+                 <!-- Column 2: Product -->
+                 <div>
+                    <h5 class="font-semibold mb-4 text-gray-800 dark:text-gray-200 uppercase text-sm tracking-wider">Product</h5>
+                     <ul class="space-y-2 text-sm">
+                        <li><a href="#features" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Features</a></li>
+                         <li><a href="#how-it-works" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">How It Works</a></li>
+                         <li><a href="#ai-assistant" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">AI Assistant</a></li>
+                         <li><a href="#analytics" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Analytics</a></li>
+                         <li><a href="#pricing" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Pricing</a></li>
+                    </ul>
+                 </div>
+                <!-- Column 3: Resources -->
+                 <div>
+                     <h5 class="font-semibold mb-4 text-gray-800 dark:text-gray-200 uppercase text-sm tracking-wider">Resources</h5>
+                     <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Documentation</a></li>
+                         <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Support Center</a></li>
+                         <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Blog</a></li>
+                         <li><a href="#troubleshooting" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Troubleshooting</a></li>
+                         <li><a href="#contributing" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Contribute (GitHub)</a></li>
+                     </ul>
+                 </div>
+                <!-- Column 4: Company -->
+                <div>
+                    <h5 class="font-semibold mb-4 text-gray-800 dark:text-gray-200 uppercase text-sm tracking-wider">Company</h5>
+                     <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">About Us</a></li>
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Careers</a></li>
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Contact</a></li>
+                     </ul>
+                </div>
+                 <!-- Column 5: Legal -->
+                 <div class="mt-6 md:mt-0">
+                     <h5 class="font-semibold mb-4 text-gray-800 dark:text-gray-200 uppercase text-sm tracking-wider">Legal</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-blue-500 dark:hover:text-blue-400 transition duration-200">License (MIT)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-gray-300 dark:border-gray-700 my-8" />
+            <div class="text-center text-sm">
+                © <span id="currentYear"></span> InvManage Pro. All Rights Reserved. Crafted with <i class="fas fa-heart text-red-500 mx-1"></i> using Django & Tailwind CSS.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 opacity-0 visibility-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 z-50" aria-label="Back to Top" title="Back to Top">
+        <i class="fas fa-arrow-up text-lg"></i>
+    </button>
+
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- Mobile Menu Logic ---
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenu.classList.toggle('hidden');
+                hamburger.classList.toggle('active');
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            });
+
+            // Close mobile menu on link click
+            mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    hamburger.classList.remove('active');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+             // --- Dark Mode Logic ---
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeToggleMobile = document.getElementById('darkModeToggleMobile');
+            const htmlElement = document.documentElement;
+
+            const applyTheme = (theme) => {
+                 if (theme === 'dark') {
+                     htmlElement.classList.add('dark');
+                     localStorage.theme = 'dark';
+                 } else {
+                    htmlElement.classList.remove('dark');
+                    localStorage.theme = 'light';
+                 }
+             };
+
+            const toggleDarkMode = () => {
+                 const currentTheme = localStorage.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(currentTheme);
+            }
+
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            darkModeToggleMobile.addEventListener('click', toggleDarkMode);
+            // Ensure correct theme on load based on initial check
+            applyTheme(localStorage.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+
+             // --- Enhanced Intersection Observer for Various Animations ---
+             const revealElements = document.querySelectorAll('.reveal');
+             const observerOptions = {
+                 root: null,
+                 rootMargin: '0px',
+                 threshold: 0.1 // Adjust as needed (0.1 means 10% visible)
+            };
+
+             const observerCallback = (entries, observer) => {
+                 entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const animationType = entry.target.dataset.animation || 'fade-in'; // Default to fade-in
+                        entry.target.classList.add('visible', animationType);
+                        observer.unobserve(entry.target); // Animate only once
+
+                        // Check if the target is a counter
+                         if (entry.target.querySelector('.counter')) {
+                            entry.target.querySelectorAll('.counter').forEach(counter => {
+                                animateCounter(counter);
+                            });
+                        }
+                     }
+                 });
+             };
+
+             const observer = new IntersectionObserver(observerCallback, observerOptions);
+             revealElements.forEach(el => {
+                // Add initial animation state class based on data-animation attribute
+                 const animationType = el.dataset.animation || 'fade-in';
+                el.classList.add(animationType);
+                observer.observe(el);
+            });
+
+
+             // --- Counter Animation Function ---
+             function animateCounter(element) {
+                const target = +element.dataset.target;
+                const duration = +element.dataset.duration || 2000; // Default 2 seconds
+                const stepTime = Math.abs(Math.floor(duration / target)) || 50; // Calculate interval time
+                let current = 0;
+                const step = Math.max(1, Math.floor(target / (duration / stepTime))); // Increment value
+
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        element.innerText = target.toLocaleString(); // Format with commas
+                         clearInterval(timer);
+                     } else {
+                        element.innerText = current.toLocaleString();
+                    }
+                }, stepTime);
+                 element.style.opacity = 1; // Make visible
+            }
+
+            // Add initial opacity 0 for counters to fade in during animation
+            document.querySelectorAll('.counter').forEach(c => c.style.opacity = 0);
+
+
+             // --- Navbar Scroll Effect ---
+             const navbar = document.getElementById('navbar');
+            const scrollThreshold = 80; // Increased threshold
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+
+             const handleScroll = () => {
+                if (window.scrollY > scrollThreshold) {
+                     navbar.classList.add('scrolled');
+                 } else {
+                     navbar.classList.remove('scrolled');
+                }
+                // Optional: Hide navbar on scroll down, show on scroll up
+                // if (window.scrollY > lastScrollY && window.scrollY > navbar.offsetHeight) {
+                //     navbar.style.transform = 'translateY(-100%)'; // Hide
+                // } else {
+                //     navbar.style.transform = 'translateY(0)'; // Show
+                // }
+                // lastScrollY = window.scrollY;
+            };
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                         handleScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+            handleScroll(); // Initial check
+
+
+            // --- Back to Top Button ---
+            const backToTopButton = document.getElementById('backToTop');
+            const topThreshold = 400;
+
+            const handleBackToTopScroll = () => {
+                 if (window.scrollY > topThreshold) {
+                     backToTopButton.style.opacity = '1';
+                    backToTopButton.style.visibility = 'visible';
+                } else {
+                     backToTopButton.style.opacity = '0';
+                    backToTopButton.style.visibility = 'hidden';
+                }
+            };
+
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+             window.addEventListener('scroll', handleBackToTopScroll);
+             handleBackToTopScroll();
+
+
+            // --- Footer Year Update ---
+             document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

@@ -18,6 +18,10 @@ from .views_analytics import generate_demo_sales_data, generate_demo_inventory_d
 def test_view(request):
     return HttpResponse("Server is running!")
 
+# Landing page view
+def landing_page(request):
+    return render(request, 'landing_page.html')
+
 # Test view for Chart.js
 def test_chart(request):
     return render(request, 'products/test_chart.html')

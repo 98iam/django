@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 # Authentication settings
 LOGIN_URL = '/auth/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/auth/login/'
 
 ROOT_URLCONF = "invent.urls"
